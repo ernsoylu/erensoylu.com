@@ -174,7 +174,7 @@ export const PostManager = () => {
         try {
             const dataToSave = {
                 title: formData.title,
-                slug: formData.slug || formData.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+                slug: formData.slug || formData.title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, ''),
                 content: formData.content,
                 excerpt: formData.excerpt,
                 image_url: formData.image_url,
@@ -226,7 +226,7 @@ export const PostManager = () => {
         try {
             const dataToSave = {
                 title: formData.title,
-                slug: formData.slug || formData.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+                slug: formData.slug || formData.title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, ''),
                 content: formData.content,
                 excerpt: formData.excerpt,
                 image_url: formData.image_url,
