@@ -32,6 +32,7 @@ export const FileManager = () => {
     const [draggedItem, setDraggedItem] = useState<string | null>(null)
     const [dropTarget, setDropTarget] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const dragFileCounterRef = useRef(0)
 
     const BUCKET_NAME = "media"
 
@@ -121,6 +122,40 @@ export const FileManager = () => {
             handleUpload(e.dataTransfer.files)
         }
     }
+
+    useEffect(() => {
+        const hasFiles = (e: DragEvent) => {
+            const types = e.dataTransfer?.types
+            if (!types) return false
+            return Array.from(types).includes("Files")
+        }
+
+        const onDragEnter = (e: DragEvent) => {
+            if (!hasFiles(e)) return
+            dragFileCounterRef.current += 1
+            setDragActive(true)
+        }
+
+        const onDragLeave = (e: DragEvent) => {
+            if (!hasFiles(e)) return
+            dragFileCounterRef.current = Math.max(0, dragFileCounterRef.current - 1)
+            if (dragFileCounterRef.current === 0) setDragActive(false)
+        }
+
+        const onDropWindow = () => {
+            dragFileCounterRef.current = 0
+            setDragActive(false)
+        }
+
+        globalThis.window.addEventListener("dragenter", onDragEnter)
+        globalThis.window.addEventListener("dragleave", onDragLeave)
+        globalThis.window.addEventListener("drop", onDropWindow)
+        return () => {
+            globalThis.window.removeEventListener("dragenter", onDragEnter)
+            globalThis.window.removeEventListener("dragleave", onDragLeave)
+            globalThis.window.removeEventListener("drop", onDropWindow)
+        }
+    }, [])
 
     const handleDelete = async (fileName: string) => {
         if (!confirm("Are you sure?")) return
@@ -492,13 +527,19 @@ export const FileManager = () => {
             </div>
 
             {/* Drag & Drop Zone */}
-            <div
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                className={dragZoneClassName}
-            >
+            <div className={`${dragZoneClassName} relative`}>
+                {dragActive && (
+                    <input
+                        type="file"
+                        multiple
+                        className="absolute inset-0 z-10 opacity-0"
+                        aria-label="Drop files to upload"
+                        onDragEnter={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
+                        onDrop={handleDrop}
+                    />
+                )}
                 <button
                     type="button"
                     className="sr-only"
