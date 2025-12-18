@@ -5,8 +5,8 @@ export interface TableBlockProps {
 
 const hashString = (input: string) => {
     let hash = 5381
-    for (let i = 0; i < input.length; i++) {
-        hash = (hash * 33) ^ input.charCodeAt(i)
+    for (const char of input) {
+        hash = (hash * 33) ^ (char.codePointAt(0) ?? 0)
     }
     return (hash >>> 0).toString(36)
 }

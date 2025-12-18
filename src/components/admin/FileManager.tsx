@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,6 +31,7 @@ export const FileManager = () => {
     const [newFolderName, setNewFolderName] = useState('')
     const [draggedItem, setDraggedItem] = useState<string | null>(null)
     const [dropTarget, setDropTarget] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const BUCKET_NAME = "media"
 
@@ -310,6 +311,7 @@ export const FileManager = () => {
                     const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/") ||
                         file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
                     const isSelected = selectedFiles.has(file.name)
+                    const checkboxId = `select-${file.id}`
 
                     return (
                         <Card
@@ -321,44 +323,46 @@ export const FileManager = () => {
                                 setDraggedItem(file.name)
                             }}
                         >
-                            <div
-                                className="aspect-square bg-muted flex items-center justify-center cursor-pointer"
-                                role="checkbox"
-                                aria-checked={isSelected}
-                                tabIndex={0}
-                                aria-label={`${isSelected ? "Deselect" : "Select"} ${file.name}`}
-                                onClick={() => toggleFileSelection(file.name)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault()
-                                        toggleFileSelection(file.name)
-                                    }
-                                }}
-                            >
-                                {isImage ? (
-                                    <img src={url} alt={file.name} className="object-cover w-full h-full" />
-                                ) : (
-                                    <File className="w-12 h-12 text-muted-foreground" />
-                                )}
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                    <Button size="icon" variant="secondary" onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleCopyUrl(url, file.id)
-                                    }}>
-                                        {copiedId === file.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                    </Button>
-                                    <Button size="icon" variant="secondary" onClick={(e) => {
-                                        e.stopPropagation()
-                                        window.open(url, '_blank')
-                                    }}>
-                                        <Download className="w-4 h-4" />
-                                    </Button>
-                                    <Button size="icon" variant="destructive" onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleDelete(file.name)
-                                    }}>
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
+                            <div className="relative">
+                                <input
+                                    id={checkboxId}
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => toggleFileSelection(file.name)}
+                                    className="sr-only peer"
+                                    aria-label={`${isSelected ? "Deselect" : "Select"} ${file.name}`}
+                                />
+                                <label
+                                    htmlFor={checkboxId}
+                                    className="aspect-square bg-muted flex items-center justify-center cursor-pointer peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2"
+                                >
+                                    {isImage ? (
+                                        <img src={url} alt={file.name} className="object-cover w-full h-full" />
+                                    ) : (
+                                        <File className="w-12 h-12 text-muted-foreground" />
+                                    )}
+                                </label>
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <div className="w-full h-full flex items-center justify-center gap-2 pointer-events-auto">
+                                        <Button size="icon" variant="secondary" onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleCopyUrl(url, file.id)
+                                        }}>
+                                            {copiedId === file.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                        </Button>
+                                        <Button size="icon" variant="secondary" onClick={(e) => {
+                                            e.stopPropagation()
+                                            window.open(url, '_blank')
+                                        }}>
+                                            <Download className="w-4 h-4" />
+                                        </Button>
+                                        <Button size="icon" variant="destructive" onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDelete(file.name)
+                                        }}>
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="p-2">
@@ -476,6 +480,7 @@ export const FileManager = () => {
                         multiple
                         onChange={handleFileInput}
                         className="hidden"
+                        ref={fileInputRef}
                     />
                     {selectedFiles.size > 0 && (
                         <Button variant="destructive" onClick={handleBulkDelete}>
@@ -493,6 +498,15 @@ export const FileManager = () => {
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
                 className={dragZoneClassName}
+                role="button"
+                tabIndex={0}
+                aria-label="File upload drop zone"
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault()
+                        fileInputRef.current?.click()
+                    }
+                }}
             >
                 {content}
             </div>
