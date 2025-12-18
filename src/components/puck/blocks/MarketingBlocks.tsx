@@ -119,7 +119,7 @@ export const Testimonials = ({ title, testimonials }: TestimonialsProps) => (
                 <Card key={t.name} className="bg-card/50">
                     <CardContent className="p-6">
                         <div className="flex mb-4">
-                            {[...Array(5)].map((_, i) => <Star key={`star-${i}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
+                            {[...new Array(5)].map((_, i) => <Star key={`star-${i}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
                         </div>
                         <p className="text-muted-foreground mb-4 italic">"{t.quote}"</p>
                         <div className="flex items-center gap-3">

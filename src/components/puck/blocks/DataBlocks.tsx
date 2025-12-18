@@ -18,16 +18,16 @@ export const TableBlock = ({ headers, rows }: TableBlockProps) => {
                 <table className="w-full border-collapse">
                     <thead>
                         <tr className="border-b">
-                            {headerArray.map((header: string, idx: number) => (
-                                <th key={idx} className="text-left p-3 font-semibold">{header}</th>
+                            {headerArray.map((header: string) => (
+                                <th key={header} className="text-left p-3 font-semibold">{header}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
                         {rowsArray.map((cells: string[], rowIdx: number) => (
-                            <tr key={rowIdx} className="border-b hover:bg-muted/50">
+                            <tr key={`row-${rowIdx}`} className="border-b hover:bg-muted/50">
                                 {cells.map((cell: string, cellIdx: number) => (
-                                    <td key={cellIdx} className="p-3">{cell}</td>
+                                    <td key={`${rowIdx}-${cellIdx}`} className="p-3">{cell}</td>
                                 ))}
                             </tr>
                         ))}
