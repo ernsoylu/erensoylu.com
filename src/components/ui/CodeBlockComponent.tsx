@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export const CodeBlockComponent = ({ node, updateAttributes, extension }: any) => {
+export const CodeBlockComponent = ({ node, updateAttributes }: any) => {
     const [copied, setCopied] = useState(false)
 
     const copyToClipboard = () => {
@@ -58,7 +58,7 @@ export const CodeBlockComponent = ({ node, updateAttributes, extension }: any) =
 
                 {/* Code Content */}
                 <pre className="p-4 overflow-x-auto">
-                    <NodeViewContent as="code" className="language-{node.attrs.language}" />
+                    <NodeViewContent className="language-{node.attrs.language}" />
                 </pre>
             </div>
         </NodeViewWrapper>
