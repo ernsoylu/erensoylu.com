@@ -477,53 +477,7 @@ export const AuthorBio = ({ name, role, bio, avatarUrl }: any) => (
     </section>
 );
 
-// 27. Footer
-export const Footer = ({ copyrightText, links, socialLinks }: any) => (
-    <footer className="bg-muted/30 border-t mt-16">
-        <div className="container mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                <div>
-                    <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
-                    <ul className="space-y-2">
-                        {links?.map((link: any, i: number) => (
-                            <li key={i}>
-                                <Link to={link.url} className="text-muted-foreground hover:text-primary transition-colors">
-                                    {link.label}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    <h3 className="font-semibold text-lg mb-4">Connect</h3>
-                    <div className="flex gap-4">
-                        {socialLinks?.map((social: any, i: number) => (
-                            <a
-                                key={i}
-                                href={social.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-muted-foreground hover:text-primary transition-colors"
-                            >
-                                {social.platform}
-                            </a>
-                        ))}
-                    </div>
-                </div>
-                <div>
-                    <h3 className="font-semibold text-lg mb-4">About</h3>
-                    <p className="text-muted-foreground text-sm">
-                        {copyrightText || "© 2025 All rights reserved."}
-                    </p>
-                </div>
-            </div>
-            <Separator className="my-6" />
-            <div className="text-center text-sm text-muted-foreground">
-                Built with React & Supabase
-            </div>
-        </div>
-    </footer>
-);
+
 
 // 28. Latest Pages
 export const LatestPages = ({ title, limit }: any) => {
@@ -587,7 +541,7 @@ export const config: Config = {
     categories: {
         layout: {
             title: "Layout",
-            components: ["Hero", "Spacer", "Divider", "SeparatorBlock", "Footer"]
+            components: ["Hero", "Spacer", "Divider", "SeparatorBlock"]
         },
         content: {
             title: "Content",
@@ -822,19 +776,7 @@ export const config: Config = {
             defaultProps: { name: "John Doe", role: "Author & Developer", bio: "Passionate about technology and writing.", avatarUrl: "" },
             render: AuthorBio
         },
-        Footer: {
-            fields: {
-                copyrightText: { type: "text" },
-                links: { type: "array", arrayFields: { label: { type: "text" }, url: { type: "text" } } },
-                socialLinks: { type: "array", arrayFields: { platform: { type: "text" }, url: { type: "text" } } }
-            },
-            defaultProps: {
-                copyrightText: "© 2025 All rights reserved.",
-                links: [{ label: "Home", url: "/" }, { label: "Posts", url: "/posts" }],
-                socialLinks: [{ platform: "Twitter", url: "https://twitter.com" }, { platform: "GitHub", url: "https://github.com" }]
-            },
-            render: Footer
-        },
+
         LatestPages: {
             fields: {
                 title: { type: "text" },

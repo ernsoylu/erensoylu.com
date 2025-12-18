@@ -127,14 +127,14 @@ export const PostView = () => {
     if (loading) return <div className="min-h-screen pt-24 text-center">Loading...</div>
 
     if (!post) return (
-        <div className="min-h-screen pt-24 text-center">
+        <div className="min-h-screen pt-20 md:pt-24 text-center">
             <h1 className="text-2xl font-bold mb-4">Post not found</h1>
             <Link to="/" className="text-primary hover:underline">Back to Home</Link>
         </div>
     )
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto">
+        <div className="min-h-screen pt-20 md:pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto">
             <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
             </Link>

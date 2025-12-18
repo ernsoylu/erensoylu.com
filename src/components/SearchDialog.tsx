@@ -84,17 +84,13 @@ export const SearchDialog = ({ mobile = false }: { mobile?: boolean }) => {
     if (mobile) {
         return (
             <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="w-full bg-background pl-8"
-                    onFocus={() => setOpen(true)}
-                />
-                {/* Actual Dialog is separate to avoid nesting issues in sheet potentially, 
-                 but for simplicity reusing the trigger logic might be tricky if we want the input *itself* to be the trigger.
-                 Let's just use a button or make the input readonly and open dialog on click. */}
-                <div className="absolute inset-0 cursor-pointer" onClick={() => setOpen(true)} />
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground z-10" />
+                <button
+                    className="flex h-10 w-full items-center rounded-md border border-input bg-background pl-9 pr-3 text-sm text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={() => setOpen(true)}
+                >
+                    Search...
+                </button>
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogContent className="sm:max-w-[425px] top-[20%] translate-y-0">
                         <DialogHeader>

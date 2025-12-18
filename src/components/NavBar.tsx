@@ -34,6 +34,7 @@ export const NavBar = () => {
   const isMobile = useIsMobile()
   const [session, setSession] = useState<any>(null)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -180,8 +181,8 @@ export const NavBar = () => {
 
         {/* Mobile Navigation Toggle */}
         <div className="flex md:hidden w-full items-center justify-between">
-          <span className="font-bold text-lg tracking-tight">Eren SOYLU</span>
-          <Sheet>
+          <Link to="/" className="font-bold text-lg tracking-tight">Eren SOYLU</Link>
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
               <button
                 className="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none"
@@ -192,7 +193,9 @@ export const NavBar = () => {
             </SheetTrigger>
             <SheetContent side="right" className="pt-10 pr-6 pl-6 flex flex-col h-full">
               <SheetHeader className="text-left mb-6">
-                <SheetTitle className="text-xl font-bold">Eren SOYLU</SheetTitle>
+                <SheetTitle className="text-xl font-bold">
+                  <Link to="/" onClick={() => setIsSheetOpen(false)}>Eren SOYLU</Link>
+                </SheetTitle>
               </SheetHeader>
 
               {/* Mobile Search */}
@@ -211,6 +214,7 @@ export const NavBar = () => {
                             <Link
                               key={child.id}
                               to={child.path}
+                              onClick={() => setIsSheetOpen(false)}
                               className="block text-base font-medium text-foreground/80 hover:text-primary transition-colors"
                             >
                               {child.label}
@@ -221,6 +225,7 @@ export const NavBar = () => {
                     ) : (
                       <Link
                         to={item.path}
+                        onClick={() => setIsSheetOpen(false)}
                         className="block text-lg font-medium text-foreground hover:text-primary transition-colors"
                       >
                         {item.label}
@@ -232,6 +237,7 @@ export const NavBar = () => {
                 {session && (
                   <Link
                     to="/admin"
+                    onClick={() => setIsSheetOpen(false)}
                     className="block text-lg font-medium text-primary hover:text-primary/80 transition-colors"
                   >
                     Dashboard
@@ -244,6 +250,7 @@ export const NavBar = () => {
                 {session ? (
                   <Link
                     to="/admin" // Or handle logout
+                    onClick={() => setIsSheetOpen(false)}
                     className="flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors"
                   >
                     <LayoutDashboard className="h-5 w-5" />
@@ -252,6 +259,7 @@ export const NavBar = () => {
                 ) : (
                   <Link
                     to="/login"
+                    onClick={() => setIsSheetOpen(false)}
                     className="flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors"
                   >
                     <LogIn className="h-5 w-5" />
