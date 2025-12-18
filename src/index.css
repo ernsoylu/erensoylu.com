@@ -48,6 +48,65 @@
     --tw-prose-th-borders: var(--border);
     --tw-prose-td-borders: var(--border);
   }
+
+  /* Code block syntax highlighting */
+  .prose pre {
+    @apply bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto my-4;
+  }
+
+  .prose code {
+    @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0 text-sm;
+  }
+
+  /* Highlight.js syntax colors */
+  .hljs-comment,
+  .hljs-quote {
+    @apply text-gray-500 italic;
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-subst {
+    @apply text-pink-400 font-semibold;
+  }
+
+  .hljs-number,
+  .hljs-literal,
+  .hljs-variable,
+  .hljs-template-variable {
+    @apply text-orange-400;
+  }
+
+  .hljs-string,
+  .hljs-doctag {
+    @apply text-green-400;
+  }
+
+  .hljs-title,
+  .hljs-section,
+  .hljs-selector-id {
+    @apply text-blue-400 font-semibold;
+  }
+
+  .hljs-type,
+  .hljs-class .hljs-title {
+    @apply text-yellow-400;
+  }
+
+  .hljs-tag,
+  .hljs-name,
+  .hljs-attribute {
+    @apply text-cyan-400;
+  }
+
+  .hljs-built_in,
+  .hljs-builtin-name {
+    @apply text-teal-400;
+  }
 }
 
 
