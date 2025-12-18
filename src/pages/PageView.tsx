@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useNavigate } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { logger } from "@/lib/logger"
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog"
@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, ArrowLeft, Edit, Trash } from "lucide-react"
 import { TiptapRenderer } from "@/components/ui/TiptapRenderer"
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
 interface Page {
@@ -87,7 +86,7 @@ export const PageView = () => {
             tocItems.push({
                 id,
                 text: heading.textContent || "",
-                level: parseInt(heading.tagName.substring(1))
+                level: Number.parseInt(heading.tagName.substring(1))
             })
         })
 

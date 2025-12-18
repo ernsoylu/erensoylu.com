@@ -32,7 +32,7 @@ export const PageListView = () => {
     // Filters
     const searchQuery = searchParams.get("s") || ""
     const sortOrder = searchParams.get("sort") || "newest"
-    const page = parseInt(searchParams.get("page") || "1")
+    const page = Number.parseInt(searchParams.get("page") || "1")
     const PAGE_SIZE = 9
 
     useEffect(() => {

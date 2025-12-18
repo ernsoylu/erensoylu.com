@@ -22,7 +22,7 @@ export function UnsavedChangesDialog({
     onSaveDraft,
     onPublish,
     onDiscard,
-}: UnsavedChangesDialogProps) {
+}: Readonly<UnsavedChangesDialogProps>) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>

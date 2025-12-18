@@ -22,7 +22,7 @@ export function DeleteConfirmDialog({
     onConfirm,
     title = "Are you sure?",
     description = "This action cannot be undone. This will permanently delete the item.",
-}: DeleteConfirmDialogProps) {
+}: Readonly<DeleteConfirmDialogProps>) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>

@@ -47,7 +47,7 @@ export const PostListView = () => {
     const searchQuery = searchParams.get("s") || ""
     const categorySlug = searchParams.get("category") || "all"
     const sortOrder = searchParams.get("sort") || "newest"
-    const page = parseInt(searchParams.get("page") || "1")
+    const page = Number.parseInt(searchParams.get("page") || "1")
     const PAGE_SIZE = 9
 
     useEffect(() => {

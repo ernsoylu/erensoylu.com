@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import type { Session } from "@supabase/supabase-js"
-import { Menu, LogIn, LayoutDashboard } from "lucide-react"
+import { Menu, LogIn, LayoutDashboard, Search } from "lucide-react"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { supabase } from "@/lib/supabase"
 import {
@@ -36,6 +36,7 @@ export const NavBar = () => {
   const [session, setSession] = useState<Session | null>(null)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
 
 
@@ -185,93 +186,108 @@ export const NavBar = () => {
         {/* Mobile Navigation Toggle */}
         <div className="flex md:hidden w-full items-center justify-between">
           <Link to="/" className="font-bold text-lg tracking-tight">Eren SOYLU</Link>
-          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-            <SheetTrigger asChild>
-              <button
-                className="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none"
-              >
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle menu</span>
-              </button>
-            </SheetTrigger>
-            <SheetContent side="right" className="pt-10 pr-6 pl-6 flex flex-col h-full">
-              <SheetHeader className="text-left mb-6">
-                <SheetTitle className="text-xl font-bold">
-                  <Link to="/" onClick={() => setIsSheetOpen(false)}>Eren SOYLU</Link>
-                </SheetTitle>
-              </SheetHeader>
+          <div className="flex items-center gap-2">
+            {/* Mobile Search Icon */}
+            <button
+              className="inline-flex items-center justify-center rounded-full p-2 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none"
+              title="Search"
+              onClick={() => setMobileSearchOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+              <span className="sr-only">Search</span>
+            </button>
 
-              {/* Mobile Search */}
-              <div className="mb-6">
-                <SearchDialog mobile />
-              </div>
+            {/* Hamburger Menu */}
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+              <SheetTrigger asChild>
+                <button
+                  className="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none"
+                >
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle menu</span>
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="pt-10 pr-6 pl-6 flex flex-col h-full">
+                <SheetHeader className="text-left mb-6">
+                  <SheetTitle className="text-xl font-bold">
+                    <Link to="/" onClick={() => setIsSheetOpen(false)}>Eren SOYLU</Link>
+                  </SheetTitle>
+                </SheetHeader>
 
-              <div className="flex flex-col space-y-6 flex-1">
-                {menuItems.map(item => (
-                  <div key={item.id}>
-                    {item.children && item.children.length > 0 ? (
-                      <div className="space-y-3">
-                        <h4 className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">{item.label}</h4>
-                        <div className="flex flex-col space-y-3 pl-4 border-l-2 border-border/50">
-                          {item.children.map(child => (
-                            <Link
-                              key={child.id}
-                              to={child.path}
-                              onClick={() => setIsSheetOpen(false)}
-                              className="block text-base font-medium text-foreground/80 hover:text-primary transition-colors"
-                            >
-                              {child.label}
-                            </Link>
-                          ))}
+
+                <div className="flex flex-col space-y-6 flex-1">
+                  {menuItems.map(item => (
+                    <div key={item.id}>
+                      {item.children && item.children.length > 0 ? (
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-muted-foreground uppercase text-xs tracking-wider">{item.label}</h4>
+                          <div className="flex flex-col space-y-3 pl-4 border-l-2 border-border/50">
+                            {item.children.map(child => (
+                              <Link
+                                key={child.id}
+                                to={child.path}
+                                onClick={() => setIsSheetOpen(false)}
+                                className="block text-base font-medium text-foreground/80 hover:text-primary transition-colors"
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <Link
-                        to={item.path}
-                        onClick={() => setIsSheetOpen(false)}
-                        className="block text-lg font-medium text-foreground hover:text-primary transition-colors"
-                      >
-                        {item.label}
-                      </Link>
-                    )}
-                  </div>
-                ))}
+                      ) : (
+                        <Link
+                          to={item.path}
+                          onClick={() => setIsSheetOpen(false)}
+                          className="block text-lg font-medium text-foreground hover:text-primary transition-colors"
+                        >
+                          {item.label}
+                        </Link>
+                      )}
+                    </div>
+                  ))}
 
-                {session && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setIsSheetOpen(false)}
-                    className="block text-lg font-medium text-primary hover:text-primary/80 transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                )}
-              </div>
+                  {session && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsSheetOpen(false)}
+                      className="block text-lg font-medium text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                </div>
 
-              {/* Mobile Login at Bottom */}
-              <div className="border-t pt-4 mt-auto pb-6">
-                {session ? (
-                  <Link
-                    to="/admin" // Or handle logout
-                    onClick={() => setIsSheetOpen(false)}
-                    className="flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors"
-                  >
-                    <LayoutDashboard className="h-5 w-5" />
-                    Dashboard
-                  </Link>
-                ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => setIsSheetOpen(false)}
-                    className="flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors"
-                  >
-                    <LogIn className="h-5 w-5" />
-                    Login
-                  </Link>
-                )}
-              </div>
-            </SheetContent>
-          </Sheet>
+                {/* Mobile Login at Bottom */}
+                <div className="border-t pt-4 mt-auto pb-6">
+                  {session ? (
+                    <Link
+                      to="/admin" // Or handle logout
+                      onClick={() => setIsSheetOpen(false)}
+                      className="flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors"
+                    >
+                      <LayoutDashboard className="h-5 w-5" />
+                      Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/login"
+                      onClick={() => setIsSheetOpen(false)}
+                      className="flex items-center gap-2 text-lg font-medium text-foreground hover:text-primary transition-colors"
+                    >
+                      <LogIn className="h-5 w-5" />
+                      Login
+                    </Link>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Mobile Search Dialog - outside Sheet so it doesn't unmount */}
+          <SearchDialog
+            open={mobileSearchOpen}
+            onOpenChange={setMobileSearchOpen}
+          />
         </div>
       </div>
     </header>

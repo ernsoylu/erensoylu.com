@@ -102,7 +102,7 @@ export const SortableMenuItem = ({
                                         min={1}
                                         max={12}
                                         value={item.grid_cols || 1}
-                                        onChange={(e) => onUpdate(item.id, { grid_cols: parseInt(e.target.value) || 1 })}
+                                        onChange={(e) => onUpdate(item.id, { grid_cols: Number.parseInt(e.target.value) || 1 })}
                                         className="h-7 w-16 bg-background"
                                     />
                                 </div>
@@ -112,7 +112,7 @@ export const SortableMenuItem = ({
                                         type="number"
                                         min={1}
                                         value={item.grid_rows || 1}
-                                        onChange={(e) => onUpdate(item.id, { grid_rows: parseInt(e.target.value) || 1 })}
+                                        onChange={(e) => onUpdate(item.id, { grid_rows: Number.parseInt(e.target.value) || 1 })}
                                         className="h-7 w-16 bg-background"
                                     />
                                 </div>
