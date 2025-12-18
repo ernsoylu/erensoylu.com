@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader2 } from "lucide-react"
+import { AdminManagerHeader } from "@/components/admin/AdminManagerHeader"
+import { AdminEmptyState } from "@/components/admin/AdminEmptyState"
 import {
     DndContext,
     closestCenter,
@@ -99,8 +101,6 @@ export const CategoryManager = () => {
         setCategories(categories.map(c => c.id === id ? { ...c, ...updates } : c))
 
         try {
-            // Exclude children from update payload if it exists
-            // Exclude children from update payload if it exists
             const dbUpdates = { ...updates }
             if ('children' in dbUpdates) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -156,15 +156,15 @@ export const CategoryManager = () => {
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-20">
-            <div className="flex justify-between items-center bg-card p-6 rounded-xl border shadow-sm">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Category Manager</h2>
-                    <p className="text-muted-foreground mt-1">Organize your content categories. Drag to reorder.</p>
-                </div>
-                <Button onClick={() => handleAddCategory(null)} size="lg">
-                    <Plus className="mr-2 h-4 w-4" /> Add Top Category
-                </Button>
-            </div>
+            <AdminManagerHeader
+                title="Category Manager"
+                description="Organize your content categories. Drag to reorder."
+                action={
+                    <Button onClick={() => handleAddCategory(null)} size="lg">
+                        <Plus className="mr-2 h-4 w-4" /> Add Top Category
+                    </Button>
+                }
+            />
 
             <DndContext
                 sensors={sensors}
@@ -206,9 +206,7 @@ export const CategoryManager = () => {
             </DndContext>
 
             {categories.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
-                    No categories found. Start by adding one.
-                </div>
+                <AdminEmptyState message="No categories found. Start by adding one." />
             )}
         </div>
     )

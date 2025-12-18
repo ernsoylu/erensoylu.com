@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader2 } from "lucide-react"
+import { AdminManagerHeader } from "@/components/admin/AdminManagerHeader"
+import { AdminEmptyState } from "@/components/admin/AdminEmptyState"
 import {
     DndContext,
     closestCenter,
@@ -168,15 +170,15 @@ export const MenuManager = () => {
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-20">
-            <div className="flex justify-between items-center bg-card p-6 rounded-xl border shadow-sm">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Menu Manager</h2>
-                    <p className="text-muted-foreground mt-1">Drag and drop to arrange your menu structure.</p>
-                </div>
-                <Button onClick={() => handleAddItem(null)} size="lg">
-                    <Plus className="mr-2 h-4 w-4" /> Add Top Menu
-                </Button>
-            </div>
+            <AdminManagerHeader
+                title="Menu Manager"
+                description="Drag and drop to arrange your menu structure."
+                action={
+                    <Button onClick={() => handleAddItem(null)} size="lg">
+                        <Plus className="mr-2 h-4 w-4" /> Add Top Menu
+                    </Button>
+                }
+            />
 
             <DndContext
                 sensors={sensors}
@@ -221,9 +223,7 @@ export const MenuManager = () => {
             </DndContext>
 
             {items.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-xl">
-                    No menu items found. Get started by adding a top menu!
-                </div>
+                <AdminEmptyState message="No menu items found. Get started by adding a top menu!" />
             )}
 
             <LinkSelectorModal
