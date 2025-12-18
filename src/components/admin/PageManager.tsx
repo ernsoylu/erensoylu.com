@@ -61,11 +61,10 @@ export const PageManager = () => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             if (isDirty) {
                 e.preventDefault()
-                e.returnValue = ""
             }
         }
-        window.addEventListener("beforeunload", handleBeforeUnload)
-        return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+        globalThis.window.addEventListener("beforeunload", handleBeforeUnload)
+        return () => globalThis.window.removeEventListener("beforeunload", handleBeforeUnload)
     }, [isDirty])
 
     const fetchPages = async () => {

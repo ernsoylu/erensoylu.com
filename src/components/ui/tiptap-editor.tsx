@@ -157,7 +157,7 @@ export const TiptapEditor = ({ content, onChange, placeholder = "Start typing...
     const setLink = useCallback(() => {
         if (!editor) return
         const previousUrl = editor.getAttributes('link').href
-        const url = window.prompt('URL', previousUrl)
+        const url = globalThis.window.prompt('URL', previousUrl)
 
         if (url === null) return
         if (url === '') {

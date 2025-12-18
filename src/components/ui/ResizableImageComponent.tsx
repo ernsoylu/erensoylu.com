@@ -48,17 +48,17 @@ export const ResizableImageComponent = (props: NodeViewProps) => {
 
     useEffect(() => {
         if (resizing) {
-            window.addEventListener('mousemove', onMouseMove)
-            window.addEventListener('mouseup', onMouseUp)
+            globalThis.window.addEventListener('mousemove', onMouseMove)
+            globalThis.window.addEventListener('mouseup', onMouseUp)
         } else {
-            window.removeEventListener('mousemove', onMouseMove)
-            window.removeEventListener('mouseup', onMouseUp)
+            globalThis.window.removeEventListener('mousemove', onMouseMove)
+            globalThis.window.removeEventListener('mouseup', onMouseUp)
         }
 
         return () => {
             // Cleanup
-            window.removeEventListener('mousemove', onMouseMove)
-            window.removeEventListener('mouseup', onMouseUp)
+            globalThis.window.removeEventListener('mousemove', onMouseMove)
+            globalThis.window.removeEventListener('mouseup', onMouseUp)
         }
     }, [resizing, onMouseMove, onMouseUp])
 
