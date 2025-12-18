@@ -97,6 +97,42 @@ export const PageListView = () => {
 
     const clearFilters = () => clearAllFilters(setSearchParams)
 
+    let content: React.ReactNode
+    if (loading) {
+        content = <LoadingGrid itemClassName="h-48" />
+    } else if (pages.length > 0) {
+        content = (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pages.map(pageItem => (
+                    <Link key={pageItem.id} to={`/page/${pageItem.slug}`} className="group">
+                        <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
+                            <CardHeader className="p-6">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                    <Calendar className="w-3 h-3" />
+                                    {new Date(pageItem.created_at).toLocaleDateString()}
+                                </div>
+                                <CardTitle className="text-xl leading-tight group-hover:text-primary transition-colors">
+                                    {pageItem.title}
+                                </CardTitle>
+                                <CardDescription className="line-clamp-3 mt-2">
+                                    {pageItem.excerpt || "Read more..."}
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                ))}
+            </div>
+        )
+    } else {
+        content = (
+            <EmptyState
+                title="No pages found"
+                description="Try adjusting your filters"
+                onClear={clearFilters}
+            />
+        )
+    }
+
     return (
         <ListViewLayout
             title="All Pages"
@@ -111,36 +147,7 @@ export const PageListView = () => {
                 onPageChange: (nextPage) => updateListSearchParams(searchParams, setSearchParams, "page", nextPage.toString()),
             }}
         >
-            {loading ? (
-                <LoadingGrid itemClassName="h-48" />
-            ) : pages.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {pages.map(pageItem => (
-                        <Link key={pageItem.id} to={`/page/${pageItem.slug}`} className="group">
-                            <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
-                                <CardHeader className="p-6">
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                        <Calendar className="w-3 h-3" />
-                                        {new Date(pageItem.created_at).toLocaleDateString()}
-                                    </div>
-                                    <CardTitle className="text-xl leading-tight group-hover:text-primary transition-colors">
-                                        {pageItem.title}
-                                    </CardTitle>
-                                    <CardDescription className="line-clamp-3 mt-2">
-                                        {pageItem.excerpt || "Read more..."}
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-            ) : (
-                <EmptyState
-                    title="No pages found"
-                    description="Try adjusting your filters"
-                    onClear={clearFilters}
-                />
-            )}
+            {content}
         </ListViewLayout>
     )
 }

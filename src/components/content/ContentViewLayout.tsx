@@ -46,7 +46,7 @@ export function ContentViewLayout({
   adminEditLabel,
   onDeleteClick,
   deleteDialog,
-}: ContentViewLayoutProps) {
+}: Readonly<ContentViewLayoutProps>) {
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-12 px-4 md:px-8 max-w-7xl mx-auto">
       <Link

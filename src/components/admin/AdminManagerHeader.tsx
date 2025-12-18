@@ -10,7 +10,7 @@ export function AdminManagerHeader({
   title,
   description,
   action,
-}: AdminManagerHeaderProps) {
+}: Readonly<AdminManagerHeaderProps>) {
   return (
     <div className="flex justify-between items-center bg-card p-6 rounded-xl border shadow-sm">
       <div>
@@ -21,4 +21,3 @@ export function AdminManagerHeader({
     </div>
   )
 }
-

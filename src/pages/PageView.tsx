@@ -100,7 +100,7 @@ export const PageView = () => {
             deleteDialog={{
                 open: showDeleteDialog,
                 onOpenChange: setShowDeleteDialog,
-                onConfirm: handleDelete,
+                onConfirm: () => { void handleDelete() },
                 title: "Delete Page",
                 description: "Are you sure you want to delete this page? This action cannot be undone.",
             }}

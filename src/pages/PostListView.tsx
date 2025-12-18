@@ -164,6 +164,61 @@ export const PostListView = () => {
 
     const clearFilters = () => clearAllFilters(setSearchParams)
 
+    let content: React.ReactNode
+    if (loading) {
+        content = <LoadingGrid itemClassName="h-64" />
+    } else if (posts.length > 0) {
+        content = (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {posts.map(post => (
+                    <Link key={post.id} to={`/post/${post.slug}`} className="group">
+                        <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
+                            <div className="aspect-video w-full overflow-hidden bg-muted/50 relative">
+                                {post.image_url ? (
+                                    <img
+                                        src={post.image_url}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        loading="lazy"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
+                                        <Badge variant="outline">No Image</Badge>
+                                    </div>
+                                )}
+                                {post.category && (
+                                    <Badge className="absolute top-2 left-2 bg-background/80 backdrop-blur text-foreground hover:bg-background/90">
+                                        {post.category.name}
+                                    </Badge>
+                                )}
+                            </div>
+                            <CardHeader className="p-4">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                    <Calendar className="w-3 h-3" />
+                                    {new Date(post.created_at).toLocaleDateString()}
+                                </div>
+                                <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+                                    {post.title}
+                                </CardTitle>
+                                <CardDescription className="line-clamp-2 mt-2">
+                                    {post.excerpt}
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                ))}
+            </div>
+        )
+    } else {
+        content = (
+            <EmptyState
+                title="No posts found"
+                description="Try adjusting your filters"
+                onClear={clearFilters}
+            />
+        )
+    }
+
     return (
         <ListViewLayout
             title={headerTitle}
@@ -178,55 +233,7 @@ export const PostListView = () => {
                 onPageChange: (nextPage) => updateListSearchParams(searchParams, setSearchParams, "page", nextPage.toString()),
             }}
         >
-            {loading ? (
-                <LoadingGrid itemClassName="h-64" />
-            ) : posts.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {posts.map(post => (
-                        <Link key={post.id} to={`/post/${post.slug}`} className="group">
-                            <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
-                                <div className="aspect-video w-full overflow-hidden bg-muted/50 relative">
-                                    {post.image_url ? (
-                                        <img
-                                            src={post.image_url}
-                                            alt={post.title}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            loading="lazy"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
-                                            <Badge variant="outline">No Image</Badge>
-                                        </div>
-                                    )}
-                                    {post.category && (
-                                        <Badge className="absolute top-2 left-2 bg-background/80 backdrop-blur text-foreground hover:bg-background/90">
-                                            {post.category.name}
-                                        </Badge>
-                                    )}
-                                </div>
-                                <CardHeader className="p-4">
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                        <Calendar className="w-3 h-3" />
-                                        {new Date(post.created_at).toLocaleDateString()}
-                                    </div>
-                                    <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
-                                        {post.title}
-                                    </CardTitle>
-                                    <CardDescription className="line-clamp-2 mt-2">
-                                        {post.excerpt}
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-            ) : (
-                <EmptyState
-                    title="No posts found"
-                    description="Try adjusting your filters"
-                    onClear={clearFilters}
-                />
-            )}
+            {content}
         </ListViewLayout>
     )
 }

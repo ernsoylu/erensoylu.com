@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Search, Loader2, FileText, File } from "lucide-react"
 import { supabase } from "@/lib/supabase"
@@ -36,12 +36,12 @@ export const SearchDialog = ({
     const open = controlledOpen ?? internalOpen
     const isControlled = controlledOpen !== undefined
 
-    const handleOpenChange = (newOpen: boolean) => {
+    const handleOpenChange = useCallback((newOpen: boolean) => {
         if (controlledOpen === undefined) {
             setInternalOpen(newOpen)
         }
         onOpenChange?.(newOpen)
-    }
+    }, [controlledOpen, onOpenChange])
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -52,7 +52,7 @@ export const SearchDialog = ({
         }
         document.addEventListener("keydown", down)
         return () => document.removeEventListener("keydown", down)
-    }, [open])
+    }, [open, handleOpenChange])
 
     useEffect(() => {
         if (!open) {

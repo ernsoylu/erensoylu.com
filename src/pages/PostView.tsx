@@ -113,7 +113,7 @@ export const PostView = () => {
             deleteDialog={{
                 open: showDeleteDialog,
                 onOpenChange: setShowDeleteDialog,
-                onConfirm: handleDelete,
+                onConfirm: () => { void handleDelete() },
                 title: "Delete Post",
                 description: "Are you sure you want to delete this post? This action cannot be undone.",
             }}

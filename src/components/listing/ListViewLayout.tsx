@@ -17,7 +17,7 @@ type PaginationProps = {
   onPageChange: (nextPage: number) => void
 }
 
-function Pagination({ page, totalCount, pageSize, onPageChange }: PaginationProps) {
+function Pagination({ page, totalCount, pageSize, onPageChange }: Readonly<PaginationProps>) {
   if (totalCount <= pageSize) return null
   const totalPages = Math.ceil(totalCount / pageSize)
 
@@ -62,7 +62,7 @@ export function ListViewLayout({
   onSortChange,
   pagination,
   children,
-}: ListViewLayoutProps) {
+}: Readonly<ListViewLayoutProps>) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col lg:flex-row gap-8">
@@ -100,7 +100,7 @@ type SearchSectionProps = {
   children: React.ReactNode
 }
 
-export function SidebarSection({ icon, title, children }: SearchSectionProps) {
+export function SidebarSection({ icon, title, children }: Readonly<SearchSectionProps>) {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -124,7 +124,7 @@ export function EmptyState({
   description,
   onClear,
   actionLabel = "Clear all filters",
-}: EmptyStateProps) {
+}: Readonly<EmptyStateProps>) {
   return (
     <div className="text-center py-20 bg-muted/30 rounded-2xl border-dashed border-2">
       <h3 className="text-lg font-medium">{title}</h3>
@@ -141,7 +141,7 @@ type LoadingGridProps = {
   itemClassName: string
 }
 
-export function LoadingGrid({ itemCount = 6, itemClassName }: LoadingGridProps) {
+export function LoadingGrid({ itemCount = 6, itemClassName }: Readonly<LoadingGridProps>) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {Array.from({ length: itemCount }, (_, index) => (
@@ -150,4 +150,3 @@ export function LoadingGrid({ itemCount = 6, itemClassName }: LoadingGridProps) 
     </div>
   )
 }
-
