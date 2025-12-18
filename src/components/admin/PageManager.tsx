@@ -29,7 +29,7 @@ interface Page {
     excerpt: string | null
     image_url: string | null
     published: boolean
-    draft_content?: any
+    draft_content?: Partial<Page>
     has_draft?: boolean
     draft_updated_at?: string
 }
@@ -52,7 +52,6 @@ export const PageManager = () => {
     })
 
     // Draft & Dirty State
-    // Draft & Dirty State
     const [isDirty, setIsDirty] = useState(false)
     const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
 
@@ -69,12 +68,62 @@ export const PageManager = () => {
         return () => window.removeEventListener("beforeunload", handleBeforeUnload)
     }, [isDirty])
 
+    const fetchPages = async () => {
+        logger.api("PageManager", "Fetch Pages Start")
+        try {
+            const { data, error } = await supabase.from("pages").select("*").order("title")
+            if (error) throw error
+            setPages(data || [])
+            logger.api("PageManager", "Fetch Pages Success", { count: data?.length })
+        } catch (error) {
+            logger.error("PageManager", "Fetch Pages Failed", error)
+            console.error("Error fetching pages:", error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         fetchPages()
     }, [])
 
+    const resetFormForNew = () => {
+        setCurrentPageId(null)
+        setFormData({
+            title: "",
+            slug: "",
+            content: "",
+            excerpt: "",
+            image_url: "",
+            published: false
+        })
+        setIsDirty(false)
+        setView("edit")
+    }
+
     // URL-driven state management
     useEffect(() => {
+        const loadPageIntoForm = (page: Page) => {
+            setCurrentPageId(page.id)
+
+            if (page.has_draft && page.draft_content) {
+                setFormData({ ...page.draft_content })
+                toast("Draft content loaded", {
+                    description: `Restored unsaved changes from ${new Date(page.draft_updated_at!).toLocaleString()}`,
+                    action: {
+                        label: "Dismiss",
+                        onClick: () => { }
+                    }
+                })
+            } else {
+                setFormData({ ...page })
+            }
+
+            setIsDirty(false)
+            setView("edit")
+            setSearchParams({ edit: page.id })
+        }
+
         const editId = searchParams.get('edit')
         const isNew = searchParams.get('new')
 
@@ -93,58 +142,7 @@ export const PageManager = () => {
                 setCurrentPageId(null)
             }
         }
-    }, [pages, searchParams, currentPageId, view])
-
-    const fetchPages = async () => {
-        logger.api("PageManager", "Fetch Pages Start")
-        try {
-            const { data, error } = await supabase.from("pages").select("*").order("title")
-            if (error) throw error
-            setPages(data || [])
-            logger.api("PageManager", "Fetch Pages Success", { count: data?.length })
-        } catch (error) {
-            logger.error("PageManager", "Fetch Pages Failed", error)
-            console.error("Error fetching pages:", error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const resetFormForNew = () => {
-        setCurrentPageId(null)
-        setFormData({
-            title: "",
-            slug: "",
-            content: "",
-            excerpt: "",
-            image_url: "",
-            published: false
-        })
-        setIsDirty(false)
-        setIsDirty(false)
-        setView("edit")
-    }
-
-    const loadPageIntoForm = (page: Page) => {
-        setCurrentPageId(page.id)
-
-        if (page.has_draft && page.draft_content) {
-            setFormData({ ...page.draft_content })
-            toast("Draft content loaded", {
-                description: `Restored unsaved changes from ${new Date(page.draft_updated_at!).toLocaleString()}`,
-                action: {
-                    label: "Dismiss",
-                    onClick: () => { }
-                }
-            })
-        } else {
-            setFormData({ ...page })
-        }
-
-        setIsDirty(false)
-        setView("edit")
-        setSearchParams({ edit: page.id })
-    }
+    }, [pages, searchParams, currentPageId, view, setSearchParams])
 
     const handleSaveDraft = async () => {
         logger.action("PageManager", "Save Draft Start", { id: currentPageId })
@@ -176,8 +174,6 @@ export const PageManager = () => {
                     }).eq("id", currentPageId)
                     if (error) throw error
                     toast.success("Draft revision saved")
-                    if (error) throw error
-                    toast.success("Draft revision saved")
                     logger.api("PageManager", "Save Draft Revision Success", { id: currentPageId })
                 } else {
                     const { error } = await supabase.from("pages").update({ ...dataToSave, published: false }).eq("id", currentPageId)
@@ -188,10 +184,11 @@ export const PageManager = () => {
             }
             setIsDirty(false)
             if (currentPageId) fetchPages()
-        } catch (error: any) {
+        } catch (error: unknown) {
             logger.error("PageManager", "Save Draft Failed", error)
+            const message = error instanceof Error ? error.message : "Unknown error"
             console.error("Error saving draft:", error)
-            toast.error(`Error saving draft: ${error.message}`)
+            toast.error(`Error saving draft: ${message}`)
         }
     }
 
@@ -222,11 +219,11 @@ export const PageManager = () => {
                 toast.success("Page updated and published!")
             }
             setIsDirty(false)
-            setIsDirty(false)
             fetchPages()
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error publishing page:", error)
-            toast.error(`Error publishing page: ${error.message}`)
+            const message = error instanceof Error ? error.message : "Unknown error"
+            toast.error(`Error publishing page: ${message}`)
         }
     }
 
@@ -263,8 +260,6 @@ export const PageManager = () => {
                         </Button>
                     )}
                 </div>
-
-
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">

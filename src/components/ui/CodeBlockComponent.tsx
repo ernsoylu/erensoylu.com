@@ -1,17 +1,12 @@
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react'
-import { useState, useEffect } from 'react'
+import type { NodeViewProps } from '@tiptap/react'
+import { useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export const CodeBlockComponent = ({ node, updateAttributes }: any) => {
+export const CodeBlockComponent = ({ node, updateAttributes }: NodeViewProps) => {
     const [copied, setCopied] = useState(false)
-    const [lineCount, setLineCount] = useState(1)
-
-    useEffect(() => {
-        // Count lines in the code block
-        const lines = (node.textContent || '').split('\n').length
-        setLineCount(lines)
-    }, [node.textContent])
+    const lineCount = (node.textContent || '').split('\n').length
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(node.textContent)

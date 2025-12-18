@@ -99,7 +99,12 @@ export const MenuManager = () => {
         try {
             // Debounce or just fire? For now direct fire.
             // Exclude children from update
-            const { children, ...dbUpdates } = updates as any
+            // Exclude children from update
+            const dbUpdates = { ...updates }
+            if ('children' in dbUpdates) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                delete (dbUpdates as any).children
+            }
             const { error } = await supabase.from("navbar_items").update(dbUpdates).eq("id", id)
             if (error) throw error
         } catch (error) {
@@ -147,7 +152,7 @@ export const MenuManager = () => {
 
     const handleSelectLink = (path: string, label?: string) => {
         if (editingItemId) {
-            const updates: any = { path }
+            const updates: Partial<MenuItem> = { path }
             // Only update label if it's currently "New Link" or empty (optional UX choice)
             const currentItem = items.find(i => i.id === editingItemId)
             if (currentItem && (currentItem.label === "New Link" || !currentItem.label) && label) {

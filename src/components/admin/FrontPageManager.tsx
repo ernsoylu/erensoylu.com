@@ -14,21 +14,20 @@ export const FrontPageManager = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const loadData = async () => {
+            const { data: settings } = await supabase
+                .from('site_settings')
+                .select('value')
+                .eq('key', 'puck_home')
+                .single();
+
+            if (settings?.value) {
+                setData(settings.value);
+            }
+            setLoading(false);
+        };
         loadData();
     }, []);
-
-    const loadData = async () => {
-        const { data: settings } = await supabase
-            .from('site_settings')
-            .select('value')
-            .eq('key', 'puck_home')
-            .single();
-
-        if (settings?.value) {
-            setData(settings.value);
-        }
-        setLoading(false);
-    };
 
     const handlePublish = async (newData: Data) => {
         const { error } = await supabase

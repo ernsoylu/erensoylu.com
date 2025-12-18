@@ -37,7 +37,7 @@ interface Post {
     published: boolean
     category_id: string | null
     created_at: string
-    draft_content?: any
+    draft_content?: Partial<Post>
     has_draft?: boolean
     draft_updated_at?: string
 }
@@ -215,9 +215,10 @@ export const PostManager = () => {
             }
             setIsDirty(false)
             if (currentPostId) fetchPosts()
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error saving draft:", error)
-            toast.error(`Error saving draft: ${error.message}`)
+            const message = error instanceof Error ? error.message : "Unknown error"
+            toast.error(`Error saving draft: ${message}`)
         }
     }
 
@@ -260,9 +261,10 @@ export const PostManager = () => {
             }
             setIsDirty(false)
             if (currentPostId) fetchPosts()
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error publishing:", error)
-            toast.error(`Error publishing: ${error.message}`)
+            const message = error instanceof Error ? error.message : "Unknown error"
+            toast.error(`Error publishing: ${message}`)
         }
     }
 

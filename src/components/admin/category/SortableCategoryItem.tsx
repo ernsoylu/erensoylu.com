@@ -11,6 +11,7 @@ export interface CategoryItem {
     name: string
     slug: string
     parent_id: string | null
+    sort_order?: number
     children?: CategoryItem[]
 }
 
@@ -44,7 +45,7 @@ export const SortableCategoryItem = ({
         transform: CSS.Transform.toString(transform),
         transition,
         zIndex: isDragging ? 50 : "auto",
-        position: "relative" as "relative",
+        position: "relative" as const,
     }
 
     const isRoot = depth === 0

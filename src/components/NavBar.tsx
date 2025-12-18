@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import type { Session } from "@supabase/supabase-js"
 import { Menu, LogIn, LayoutDashboard } from "lucide-react"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { supabase } from "@/lib/supabase"
@@ -32,9 +33,11 @@ interface MenuItem {
 
 export const NavBar = () => {
   const isMobile = useIsMobile()
-  const [session, setSession] = useState<any>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -47,43 +50,43 @@ export const NavBar = () => {
       setSession(session)
     })
 
+    const fetchMenu = async () => {
+      const { data } = await supabase
+        .from('navbar_items')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+
+      if (data) {
+        const itemsMap = new Map<string, MenuItem>()
+        const rootItems: MenuItem[] = []
+
+        // First pass: create items
+        data.forEach(item => {
+          itemsMap.set(item.id, { ...item, children: [] })
+        })
+
+        // Second pass: structure tree
+        data.forEach(item => {
+          const menuItem = itemsMap.get(item.id)!
+          if (item.parent_id) {
+            const parent = itemsMap.get(item.parent_id)
+            if (parent) {
+              parent.children?.push(menuItem)
+            }
+          } else {
+            rootItems.push(menuItem)
+          }
+        })
+
+        setMenuItems(rootItems)
+      }
+    }
+
     fetchMenu()
 
     return () => subscription.unsubscribe()
   }, [])
-
-  const fetchMenu = async () => {
-    const { data } = await supabase
-      .from('navbar_items')
-      .select('*')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-
-    if (data) {
-      const itemsMap = new Map<string, MenuItem>()
-      const rootItems: MenuItem[] = []
-
-      // First pass: create items
-      data.forEach(item => {
-        itemsMap.set(item.id, { ...item, children: [] })
-      })
-
-      // Second pass: structure tree
-      data.forEach(item => {
-        const menuItem = itemsMap.get(item.id)!
-        if (item.parent_id) {
-          const parent = itemsMap.get(item.parent_id)
-          if (parent) {
-            parent.children?.push(menuItem)
-          }
-        } else {
-          rootItems.push(menuItem)
-        }
-      })
-
-      setMenuItems(rootItems)
-    }
-  }
 
   return (
     <header className="fixed top-4 z-50 w-[calc(100%-2rem)] max-w-5xl left-1/2 -translate-x-1/2 rounded-2xl bg-background/80 backdrop-blur-md shadow-sm supports-[backdrop-filter]:bg-background/60">

@@ -2,8 +2,7 @@ import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react'
 import 'highlight.js/styles/github-dark.css'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
-import Underline from '@tiptap/extension-underline'
+// Link and Underline are included in StarterKit
 import TextAlign from '@tiptap/extension-text-align'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
@@ -51,6 +50,9 @@ export const TiptapRenderer = ({ content }: TiptapRendererProps) => {
         extensions: [
             StarterKit.configure({
                 codeBlock: false,
+                // Configure Link and Underline via StarterKit if they are included
+                // or just let them use defaults if enabled by default. 
+                // Based on grep, they are included. We can customize them here if needed.
             }),
             CodeBlockLowlight.configure({
                 lowlight,
@@ -96,13 +98,7 @@ export const TiptapRenderer = ({ content }: TiptapRendererProps) => {
                     return ReactNodeViewRenderer(ResizableImageComponent)
                 },
             }),
-            Link.configure({
-                openOnClick: true, // Allow clicking links in read-only mode
-                HTMLAttributes: {
-                    class: 'text-primary underline cursor-pointer',
-                },
-            }),
-            Underline,
+            // Link and Underline removed as they are in StarterKit
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),

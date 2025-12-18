@@ -29,7 +29,6 @@ const RouteLogger = () => {
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      // @ts-ignore
       const target = e.target as HTMLElement
       const element = target.closest('button, a, input, [role="button"]') || target
       // shorten innerText

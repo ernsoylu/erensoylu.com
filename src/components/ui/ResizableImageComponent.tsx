@@ -1,26 +1,27 @@
 import { NodeViewWrapper } from '@tiptap/react'
+import type { NodeViewProps } from '@tiptap/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export const ResizableImageComponent = (props: any) => {
+export const ResizableImageComponent = (props: NodeViewProps) => {
     const { node, updateAttributes, selected } = props
-    const [width, setWidth] = useState(node.attrs.width || '100%')
-    const imgRef = useRef<HTMLImageElement>(null)
     const [resizing, setResizing] = useState(false)
+    const [localWidth, setLocalWidth] = useState<string>(node.attrs.width || '100%')
+    const imgRef = useRef<HTMLImageElement>(null)
     const [startX, setStartX] = useState(0)
     const [startWidth, setStartWidth] = useState(0)
 
     const align = node.attrs.align || 'center'
-
-    useEffect(() => {
-        setWidth(node.attrs.width || '100%')
-    }, [node.attrs.width])
+    // Use local width during resize for smooth interactions, otherwise source of truth is the node
+    const width = resizing ? localWidth : (node.attrs.width || '100%')
 
     const onMouseDown = (e: React.MouseEvent) => {
         e.preventDefault()
         setResizing(true)
         setStartX(e.clientX)
+        // Reset local width to current actual width to start fresh
+        setLocalWidth(node.attrs.width || '100%')
         if (imgRef.current) {
             setStartWidth(imgRef.current.offsetWidth)
         }
@@ -34,16 +35,16 @@ export const ResizableImageComponent = (props: any) => {
         const newWidth = startWidth + diff
 
         // Update local state for smooth feedback
-        setWidth(`${newWidth}px`)
+        setLocalWidth(`${newWidth}px`)
     }, [resizing, startX, startWidth])
 
     const onMouseUp = useCallback(() => {
         if (resizing) {
             setResizing(false)
-            // Persist the final width
-            updateAttributes({ width: width }) // This triggers the Tiptap update
+            // Persist the final width to the document
+            updateAttributes({ width: localWidth })
         }
-    }, [resizing, width, updateAttributes])
+    }, [resizing, localWidth, updateAttributes])
 
     useEffect(() => {
         if (resizing) {
@@ -55,6 +56,7 @@ export const ResizableImageComponent = (props: any) => {
         }
 
         return () => {
+            // Cleanup
             window.removeEventListener('mousemove', onMouseMove)
             window.removeEventListener('mouseup', onMouseUp)
         }

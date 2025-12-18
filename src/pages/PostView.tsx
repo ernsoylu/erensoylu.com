@@ -37,6 +37,44 @@ export const PostView = () => {
     }, [])
 
     useEffect(() => {
+        const fetchPost = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("posts")
+                    .select(`
+          id, 
+          title, 
+          content, 
+          image_url, 
+          created_at,
+          published,
+          category:categories(name)
+        `)
+                    .eq("slug", slug)
+                    .single()
+
+                if (error) throw error
+
+                // If not published, check if admin
+                if (!data.published) {
+                    const { data: { session } } = await supabase.auth.getSession()
+                    if (!session) {
+                        throw new Error("Post not found or not published")
+                    }
+                }
+
+                // @ts-expect-error - data type mismatch with Post interface
+                setPost(data)
+                logger.api("PostView", "Fetch Success", { title: data.title })
+            } catch (error) {
+                logger.error("PostView", "Fetch Failed", error)
+                console.error("Error fetching post:", error)
+                setPost(null)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         if (slug) {
             logger.view("PostView", { slug })
             fetchPost()
@@ -69,44 +107,6 @@ export const PostView = () => {
         setToc(tocItems)
     }
 
-    const fetchPost = async () => {
-        try {
-            const { data, error } = await supabase
-                .from("posts")
-                .select(`
-          id, 
-          title, 
-          content, 
-          image_url, 
-          created_at,
-          published,
-          category:categories(name)
-        `)
-                .eq("slug", slug)
-                .single()
-
-            if (error) throw error
-
-            // If not published, check if admin
-            if (!data.published) {
-                const { data: { session } } = await supabase.auth.getSession()
-                if (!session) {
-                    throw new Error("Post not found or not published")
-                }
-            }
-
-            // @ts-ignore
-            setPost(data)
-            logger.api("PostView", "Fetch Success", { title: data.title })
-        } catch (error) {
-            logger.error("PostView", "Fetch Failed", error)
-            console.error("Error fetching post:", error)
-            setPost(null)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const handleDelete = async () => {
         if (!post) return
 
@@ -117,10 +117,11 @@ export const PostView = () => {
             toast.success("Post deleted successfully")
             logger.action("PostView", "Delete Post", { id: post.id, title: post.title })
             navigate("/posts")
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Unknown error"
             logger.error("PostView", "Delete Failed", error)
             console.error("Error deleting post:", error)
-            toast.error(`Error deleting post: ${error.message}`)
+            toast.error(`Error deleting post: ${errorMessage}`)
         }
     }
 

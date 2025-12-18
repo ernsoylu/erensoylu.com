@@ -50,7 +50,7 @@ export const SortableMenuItem = ({
         transform: CSS.Transform.toString(transform),
         transition,
         zIndex: isDragging ? 50 : "auto",
-        position: "relative" as "relative",
+        position: "relative" as const,
     }
 
     const isRoot = depth === 0

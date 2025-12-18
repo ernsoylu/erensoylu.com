@@ -14,7 +14,7 @@ interface FileObject {
     id: string
     updated_at: string
     created_at: string
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
 }
 
 export const FileManager = () => {
@@ -35,27 +35,38 @@ export const FileManager = () => {
     const BUCKET_NAME = "media"
 
     useEffect(() => {
+        const fetchFiles = async () => {
+            setLoading(true)
+            try {
+                const { data, error } = await supabase.storage
+                    .from(BUCKET_NAME)
+                    .list(currentPath, {
+                        limit: 1000,
+                        offset: 0,
+                        sortBy: { column: 'created_at', order: 'desc' }
+                    })
+
+                if (error) throw error
+                setFiles(data || [])
+            } catch (error) {
+                console.error("Error fetching files:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
         fetchFiles()
     }, [currentPath])
 
     const fetchFiles = async () => {
-        setLoading(true)
-        try {
-            const { data, error } = await supabase.storage
-                .from(BUCKET_NAME)
-                .list(currentPath, {
-                    limit: 1000,
-                    offset: 0,
-                    sortBy: { column: 'created_at', order: 'desc' }
-                })
-
-            if (error) throw error
-            setFiles(data || [])
-        } catch (error) {
-            console.error("Error fetching files:", error)
-        } finally {
-            setLoading(false)
-        }
+        // Exposed for other functions to refresh
+        const { data } = await supabase.storage
+            .from(BUCKET_NAME)
+            .list(currentPath, {
+                limit: 1000,
+                offset: 0,
+                sortBy: { column: 'created_at', order: 'desc' }
+            })
+        setFiles(data || [])
     }
 
     const handleUpload = async (fileList: FileList) => {
@@ -362,7 +373,7 @@ export const FileManager = () => {
                         ))}
                         {regularFiles.map((file) => {
                             const url = getPublicUrl(file.name)
-                            const isImage = file.metadata?.mimetype?.startsWith("image/") ||
+                            const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/") ||
                                 file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
                             const isSelected = selectedFiles.has(file.name)
 
@@ -427,7 +438,7 @@ export const FileManager = () => {
                         ))}
                         {regularFiles.map((file) => {
                             const url = getPublicUrl(file.name)
-                            const isImage = file.metadata?.mimetype?.startsWith("image/")
+                            const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/")
                             const isSelected = selectedFiles.has(file.name)
 
                             return (

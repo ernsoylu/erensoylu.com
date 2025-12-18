@@ -47,7 +47,7 @@ export const CategoryManager = () => {
 
             if (error) throw error
             // Cast data to CategoryItem[] (DB schema matches now)
-            setCategories((data as any) || [])
+            setCategories((data as CategoryItem[]) || [])
         } catch (error) {
             console.error("Error fetching categories:", error)
         } finally {
@@ -59,14 +59,14 @@ export const CategoryManager = () => {
     // Sort logic usually handled by DB query, but good to enforce on client if mixing local state
     // We assume the state 'categories' is flat list
     const getRootCategories = () => categories.filter(c => !c.parent_id)
-        .sort((a, b) => (a as any).sort_order - (b as any).sort_order)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 
     const getChildCategories = (parentId: string) => categories.filter(c => c.parent_id === parentId)
-        .sort((a, b) => (a as any).sort_order - (b as any).sort_order)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 
     const handleAddCategory = async (parentId: string | null = null) => {
         const siblings = parentId ? getChildCategories(parentId) : getRootCategories()
-        const newOrder = siblings.length > 0 ? Math.max(...siblings.map(s => (s as any).sort_order || 0)) + 1 : 0
+        const newOrder = siblings.length > 0 ? Math.max(...siblings.map(s => s.sort_order || 0)) + 1 : 0
 
         try {
             const { data, error } = await supabase.from("categories").insert([{
@@ -100,7 +100,12 @@ export const CategoryManager = () => {
 
         try {
             // Exclude children from update payload if it exists
-            const { children, ...dbUpdates } = updates as any
+            // Exclude children from update payload if it exists
+            const dbUpdates = { ...updates }
+            if ('children' in dbUpdates) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                delete (dbUpdates as any).children
+            }
             const { error } = await supabase.from("categories").update(dbUpdates).eq("id", id)
             if (error) throw error
         } catch (error) {
@@ -118,7 +123,7 @@ export const CategoryManager = () => {
         const parentId = activeItem.parent_id
         // Filter siblings to perform the sort on specific level
         const siblings = categories.filter(c => c.parent_id === parentId)
-            .sort((a, b) => ((a as any).sort_order || 0) - ((b as any).sort_order || 0))
+            .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 
         const oldIndex = siblings.findIndex(c => c.id === active.id)
         const newIndex = siblings.findIndex(c => c.id === over.id)
@@ -134,7 +139,7 @@ export const CategoryManager = () => {
                 }
                 return cat
             })
-            setCategories(updatedCategories as any) // Cast back assuming sort_order exists
+            setCategories(updatedCategories) // Cast back assuming sort_order exists
 
             // Persist to DB
             for (let i = 0; i < newOrder.length; i++) {

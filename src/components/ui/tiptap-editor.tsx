@@ -2,8 +2,7 @@ import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react'
 import 'highlight.js/styles/github-dark.css' // Syntax highlighting theme
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
-import Underline from '@tiptap/extension-underline'
+// Link and Underline are included in StarterKit
 import TextAlign from '@tiptap/extension-text-align'
 import Placeholder from '@tiptap/extension-placeholder'
 import TaskList from '@tiptap/extension-task-list'
@@ -26,8 +25,8 @@ import java from 'highlight.js/lib/languages/java'
 import kotlin from 'highlight.js/lib/languages/kotlin'
 import { CodeBlockComponent } from './CodeBlockComponent'
 import { ResizableImageComponent } from './ResizableImageComponent'
+import { ToolbarButton } from './ToolbarButton'
 
-import { Button } from "@/components/ui/button"
 import {
     Bold,
     Italic,
@@ -129,13 +128,7 @@ export const TiptapEditor = ({ content, onChange, placeholder = "Start typing...
                     return ReactNodeViewRenderer(ResizableImageComponent)
                 },
             }),
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    class: 'text-primary underline cursor-pointer',
-                },
-            }),
-            Underline,
+            // Link and Underline are included in StarterKit
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
@@ -181,28 +174,7 @@ export const TiptapEditor = ({ content, onChange, placeholder = "Start typing...
 
     if (!editor) return null
 
-    const ToolbarButton = ({
-        onClick,
-        isActive = false,
-        icon: Icon,
-        label
-    }: {
-        onClick: () => void,
-        isActive?: boolean,
-        icon: any,
-        label?: string
-    }) => (
-        <Button
-            variant={isActive ? "secondary" : "ghost"}
-            size="icon"
-            onClick={onClick}
-            type="button"
-            className="h-8 w-8"
-            title={label}
-        >
-            <Icon className="h-4 w-4" />
-        </Button>
-    )
+
 
     return (
         <div className="space-y-2 border rounded-md overflow-hidden bg-background">

@@ -51,128 +51,108 @@ export const PostListView = () => {
     const PAGE_SIZE = 9
 
     useEffect(() => {
+        const fetchCategories = async () => {
+            const { data } = await supabase.from("categories").select("id, name, slug")
+            if (data) setCategories(data)
+        }
         fetchCategories()
     }, [])
 
     useEffect(() => {
+        const fetchPosts = async () => {
+            setLoading(true)
+            try {
+                let query = supabase
+                    .from("posts")
+                    .select("*, category:categories(name, slug)", { count: 'exact' })
+                    .eq("published", true)
+
+                // Filter: Category
+                if (categorySlug !== "all") {
+                    query = query.eq("category.slug", categorySlug)
+                }
+
+                // Filter: Search
+                if (searchQuery) {
+                    query = query.ilike("title", `%${searchQuery}%`)
+                }
+
+                // Sort
+                if (sortOrder === "newest") {
+                    query = query.order("created_at", { ascending: false })
+                } else if (sortOrder === "oldest") {
+                    query = query.order("created_at", { ascending: true })
+                } else if (sortOrder === "az") {
+                    query = query.order("title", { ascending: true })
+                }
+
+                // Pagination
+                const from = (page - 1) * PAGE_SIZE
+                const to = from + PAGE_SIZE - 1
+                query = query.range(from, to)
+
+                const { data, error, count } = await query
+
+                if (error) {
+                    if (categorySlug !== 'all' && error.message.includes("could not find table")) {
+                        const catRes = await supabase.from("categories").select("id").eq("slug", categorySlug).single()
+                        if (catRes.data) {
+                            let retryQuery = supabase
+                                .from("posts")
+                                .select("*, category:categories(name, slug)", { count: 'exact' })
+                                .eq("published", true)
+                                .eq("category_id", catRes.data.id)
+
+                            if (searchQuery) retryQuery = retryQuery.ilike("title", `%${searchQuery}%`)
+                            if (sortOrder === "newest") retryQuery = retryQuery.order("created_at", { ascending: false })
+                            else if (sortOrder === "oldest") retryQuery = retryQuery.order("created_at", { ascending: true })
+
+                            retryQuery = retryQuery.range(from, to)
+                            const retryRes = await retryQuery
+                            setPosts(retryRes.data || [])
+                            setTotalCount(retryRes.count || 0)
+                        }
+                    } else {
+                        console.error("Error fetching posts:", error)
+                    }
+                } else {
+                    if (categorySlug !== 'all') {
+                        const catRes = await supabase.from("categories").select("id").eq("slug", categorySlug).single()
+                        if (catRes.data) {
+                            let cleanQuery = supabase
+                                .from("posts")
+                                .select("*, category:categories(name, slug)", { count: 'exact' })
+                                .eq("published", true)
+                                .eq("category_id", catRes.data.id)
+
+                            if (searchQuery) cleanQuery = cleanQuery.ilike("title", `%${searchQuery}%`)
+
+                            if (sortOrder === "newest") cleanQuery = cleanQuery.order("created_at", { ascending: false })
+                            else if (sortOrder === "oldest") cleanQuery = cleanQuery.order("created_at", { ascending: true })
+                            else if (sortOrder === "az") cleanQuery = cleanQuery.order("title", { ascending: true })
+
+                            cleanQuery = cleanQuery.range(from, to)
+                            const res = await cleanQuery
+                            setPosts(res.data || [])
+                            setTotalCount(res.count || 0)
+                        } else {
+                            setPosts([])
+                            setTotalCount(0)
+                        }
+                    } else {
+                        setPosts(data || [])
+                        setTotalCount(count || 0)
+                    }
+                }
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         fetchPosts()
     }, [searchQuery, categorySlug, sortOrder, page])
-
-    const fetchCategories = async () => {
-        const { data } = await supabase.from("categories").select("id, name, slug")
-        if (data) setCategories(data)
-    }
-
-    const fetchPosts = async () => {
-        setLoading(true)
-        try {
-            let query = supabase
-                .from("posts")
-                .select("*, category:categories(name, slug)", { count: 'exact' })
-                .eq("published", true)
-
-            // Filter: Category
-            if (categorySlug !== "all") {
-                // We need to query by category slug. 
-                // Since generic relation filtering is tricky with dot notation in some clients, 
-                // let's do an inner join filter if possible, or fetch category ID first.
-                // Supabase supports !inner on foreign tables for filtering.
-                query = query.eq("category.slug", categorySlug)
-                // Note: If RLS or FK setup issues, this might require explicit category_id lookup.
-                // Let's try simpler exact ID match if we had it, but slug is what we have.
-                // Use the foreign key filter syntax:
-                // .not("category_id", "is", null) // implied
-                // Actually, let's reverse look up the category ID for robustness if needed, 
-                // but let's try the direct join filter first:
-            }
-
-            // Filter: Search
-            if (searchQuery) {
-                query = query.ilike("title", `%${searchQuery}%`)
-            }
-
-            // Sort
-            if (sortOrder === "newest") {
-                query = query.order("created_at", { ascending: false })
-            } else if (sortOrder === "oldest") {
-                query = query.order("created_at", { ascending: true })
-            } else if (sortOrder === "az") {
-                query = query.order("title", { ascending: true })
-            }
-
-            // Pagination
-            const from = (page - 1) * PAGE_SIZE
-            const to = from + PAGE_SIZE - 1
-            query = query.range(from, to)
-
-            const { data, error, count } = await query
-
-            if (error) {
-                // If filtering by joined column failed, try fetching via category_id
-                if (categorySlug !== 'all' && error.message.includes("could not find table")) {
-                    // Fallback: fetch category ID first
-                    const catRes = await supabase.from("categories").select("id").eq("slug", categorySlug).single()
-                    if (catRes.data) {
-                        let retryQuery = supabase
-                            .from("posts")
-                            .select("*, category:categories(name, slug)", { count: 'exact' })
-                            .eq("published", true)
-                            .eq("category_id", catRes.data.id)
-
-                        if (searchQuery) retryQuery = retryQuery.ilike("title", `%${searchQuery}%`)
-                        if (sortOrder === "newest") retryQuery = retryQuery.order("created_at", { ascending: false })
-                        else if (sortOrder === "oldest") retryQuery = retryQuery.order("created_at", { ascending: true })
-
-                        retryQuery = retryQuery.range(from, to)
-                        const retryRes = await retryQuery
-                        setPosts(retryRes.data || [])
-                        setTotalCount(retryRes.count || 0)
-                    }
-                } else {
-                    console.error("Error fetching posts:", error)
-                }
-            } else {
-                // If we filtered by category.slug using dot notation and it returned data but client did plain filter,
-                // Supabase JS client sometimes needs !inner to filter parent by child.
-                // Simpler approach: Client side filter if small data? No, paginated.
-                // Correct approach: use !inner logic or just ID lookup.
-                // Let's assume the fallback above covers us if the first try fails logic.
-                // Actually wait, let's just do the ID lookup method by default for categories, it's safer.
-                if (categorySlug !== 'all') {
-                    const catRes = await supabase.from("categories").select("id").eq("slug", categorySlug).single()
-                    if (catRes.data) {
-                        // Rerun query with ID
-                        let cleanQuery = supabase
-                            .from("posts")
-                            .select("*, category:categories(name, slug)", { count: 'exact' })
-                            .eq("published", true)
-                            .eq("category_id", catRes.data.id)
-
-                        if (searchQuery) cleanQuery = cleanQuery.ilike("title", `%${searchQuery}%`)
-
-                        if (sortOrder === "newest") cleanQuery = cleanQuery.order("created_at", { ascending: false })
-                        else if (sortOrder === "oldest") cleanQuery = cleanQuery.order("created_at", { ascending: true })
-                        else if (sortOrder === "az") cleanQuery = cleanQuery.order("title", { ascending: true })
-
-                        cleanQuery = cleanQuery.range(from, to)
-                        const res = await cleanQuery
-                        setPosts(res.data || [])
-                        setTotalCount(res.count || 0)
-                    } else {
-                        setPosts([])
-                        setTotalCount(0)
-                    }
-                } else {
-                    setPosts(data || [])
-                    setTotalCount(count || 0)
-                }
-            }
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const updateFilter = (key: string, value: string) => {
         const newParams = new URLSearchParams(searchParams)

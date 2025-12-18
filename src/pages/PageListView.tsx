@@ -36,49 +36,49 @@ export const PageListView = () => {
     const PAGE_SIZE = 9
 
     useEffect(() => {
+        const fetchPages = async () => {
+            setLoading(true)
+            try {
+                let query = supabase
+                    .from("pages")
+                    .select("*", { count: 'exact' })
+
+                // Filter: Search
+                if (searchQuery) {
+                    query = query.ilike("title", `%${searchQuery}%`)
+                }
+
+                // Sort
+                if (sortOrder === "newest") {
+                    query = query.order("created_at", { ascending: false })
+                } else if (sortOrder === "oldest") {
+                    query = query.order("created_at", { ascending: true })
+                } else if (sortOrder === "az") {
+                    query = query.order("title", { ascending: true })
+                }
+
+                // Pagination
+                const from = (page - 1) * PAGE_SIZE
+                const to = from + PAGE_SIZE - 1
+                query = query.range(from, to)
+
+                const { data, error, count } = await query
+
+                if (error) {
+                    console.error("Error fetching pages:", error)
+                } else {
+                    setPages(data || [])
+                    setTotalCount(count || 0)
+                }
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         fetchPages()
     }, [searchQuery, sortOrder, page])
-
-    const fetchPages = async () => {
-        setLoading(true)
-        try {
-            let query = supabase
-                .from("pages")
-                .select("*", { count: 'exact' })
-
-            // Filter: Search
-            if (searchQuery) {
-                query = query.ilike("title", `%${searchQuery}%`)
-            }
-
-            // Sort
-            if (sortOrder === "newest") {
-                query = query.order("created_at", { ascending: false })
-            } else if (sortOrder === "oldest") {
-                query = query.order("created_at", { ascending: true })
-            } else if (sortOrder === "az") {
-                query = query.order("title", { ascending: true })
-            }
-
-            // Pagination
-            const from = (page - 1) * PAGE_SIZE
-            const to = from + PAGE_SIZE - 1
-            query = query.range(from, to)
-
-            const { data, error, count } = await query
-
-            if (error) {
-                console.error("Error fetching pages:", error)
-            } else {
-                setPages(data || [])
-                setTotalCount(count || 0)
-            }
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const updateFilter = (key: string, value: string) => {
         const newParams = new URLSearchParams(searchParams)

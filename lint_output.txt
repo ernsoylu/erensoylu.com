@@ -1,0 +1,142 @@
+
+> erensoylu.com@0.0.0 lint
+> eslint .
+
+
+/home/eren/dev/erensoylu.com/src/App.tsx
+  32:7  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+/home/eren/dev/erensoylu.com/src/components/AdminLayout.tsx
+  104:18  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/eren/dev/erensoylu.com/src/components/AdminLayout.tsx:104:18
+  102 |             {/* Desktop Sidebar */}
+  103 |             <aside className="fixed left-0 top-0 bottom-0 z-10 hidden w-64 flex-col border-r bg-background sm:flex px-4">
+> 104 |                 <NavContent />
+      |                  ^^^^^^^^^^ This component is created during render
+  105 |             </aside>
+  106 |
+  107 |             {/* Mobile Header */}
+
+/home/eren/dev/erensoylu.com/src/components/AdminLayout.tsx:72:24
+   70 |     ]
+   71 |
+>  72 |     const NavContent = ({ mobile = false }) => (
+      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+>  73 |         <div className="flex flex-col gap-4 py-4 flex-1 h-full">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  74 |             <div className="text-xl font-bold tracking-tight px-2">Admin Panel</div>
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  97 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  98 |     )
+      | ^^^^^^ The component is created during render here
+   99 |
+  100 |     return (
+  101 |         <div className="min-h-screen w-full bg-muted/40">                                                                                             react-hooks/static-components
+  118:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/eren/dev/erensoylu.com/src/components/AdminLayout.tsx:118:26
+  116 |                     <SheetContent side="left" className="flex flex-col">
+  117 |                         <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
+> 118 |                         <NavContent mobile />
+      |                          ^^^^^^^^^^ This component is created during render
+  119 |                     </SheetContent>
+  120 |                 </Sheet>
+  121 |                 <div className="font-bold">Admin Panel</div>
+
+/home/eren/dev/erensoylu.com/src/components/AdminLayout.tsx:72:24
+   70 |     ]
+   71 |
+>  72 |     const NavContent = ({ mobile = false }) => (
+      |                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+>  73 |         <div className="flex flex-col gap-4 py-4 flex-1 h-full">
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  74 |             <div className="text-xl font-bold tracking-tight px-2">Admin Panel</div>
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  97 |         </div>
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  98 |     )
+      | ^^^^^^ The component is created during render here
+   99 |
+  100 |     return (
+  101 |         <div className="min-h-screen w-full bg-muted/40">  react-hooks/static-components
+
+/home/eren/dev/erensoylu.com/src/components/NavBar.tsx
+  35:42  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  83:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/eren/dev/erensoylu.com/src/components/NavBar.tsx:83:5
+  81 |     })
+  82 |
+> 83 |     fetchMenu()
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  84 |
+  85 |     return () => subscription.unsubscribe()
+  86 |   }, [])  react-hooks/set-state-in-effect
+
+/home/eren/dev/erensoylu.com/src/components/admin/CategoryManager.tsx
+   50:36  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  103:21  error  'children' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  103:59  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  137:48  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+/home/eren/dev/erensoylu.com/src/components/admin/FileManager.tsx
+  63:23  error  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/eren/dev/erensoylu.com/src/components/admin/FileManagerModal.tsx
+  16:31  error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  40:8   warning  React Hook useEffect has a missing dependency: 'fetchFiles'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/eren/dev/erensoylu.com/src/components/admin/FrontPageManager.tsx
+  30:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/eren/dev/erensoylu.com/src/components/admin/FrontPageManager.tsx:30:9
+  28 |
+  29 |     useEffect(() => {
+> 30 |         loadData();
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  31 |     }, []);
+  32 |
+  33 |     const handlePublish = async (newData: Data) => {  react-hooks/set-state-in-effect
+
+/home/eren/dev/erensoylu.com/src/components/admin/MenuManager.tsx
+  102:21  error  'children' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  102:59  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  150:28  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+/home/eren/dev/erensoylu.com/src/components/admin/PageManager.tsx
+   32:21  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   96:8   warning  React Hook useEffect has a missing dependency: 'loadPageIntoForm'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  191:25  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  227:25  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+/home/eren/dev/erensoylu.com/src/components/admin/PostManager.tsx
+   40:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  263:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/eren/dev/erensoylu.com/src/components/admin/menu/SortableMenuItem.tsx
+  53:33  error  Expected a `const` instead of a literal type assertion  @typescript-eslint/prefer-as-const
+
+✖ 24 problems (22 errors, 2 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

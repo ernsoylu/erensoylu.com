@@ -37,6 +37,32 @@ export const PageView = () => {
     }, [])
 
     useEffect(() => {
+        const fetchPage = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from("pages")
+                    .select(`
+          id, 
+          title, 
+          content, 
+          updated_at,
+          category:categories(name)
+        `)
+                    .eq("slug", slug)
+                    .single()
+
+                if (error) throw error
+                // @ts-expect-error - data type mismatch with Page interface
+                setPage(data)
+                logger.api("PageView", "Fetch Success", { title: data.title })
+            } catch (error) {
+                logger.error("PageView", "Fetch Failed", error)
+                console.error("Error fetching page:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         if (slug) {
             logger.view("PageView", { slug })
             fetchPage()
@@ -69,32 +95,6 @@ export const PageView = () => {
         setToc(tocItems)
     }
 
-    const fetchPage = async () => {
-        try {
-            const { data, error } = await supabase
-                .from("pages")
-                .select(`
-          id, 
-          title, 
-          content, 
-          updated_at,
-          category:categories(name)
-        `)
-                .eq("slug", slug)
-                .single()
-
-            if (error) throw error
-            // @ts-ignore
-            setPage(data)
-            logger.api("PageView", "Fetch Success", { title: data.title })
-        } catch (error) {
-            logger.error("PageView", "Fetch Failed", error)
-            console.error("Error fetching page:", error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const handleDelete = async () => {
         if (!page) return
 
@@ -105,10 +105,11 @@ export const PageView = () => {
             toast.success("Page deleted successfully")
             logger.action("PageView", "Delete Page", { id: page.id, title: page.title })
             navigate("/")
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "Unknown error"
             logger.error("PageView", "Delete Failed", error)
             console.error("Error deleting page:", error)
-            toast.error(`Error deleting page: ${error.message}`)
+            toast.error(`Error deleting page: ${errorMessage}`)
         }
     }
 

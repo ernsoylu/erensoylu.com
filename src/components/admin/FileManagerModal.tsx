@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,7 @@ import {
 interface FileObject {
     name: string
     id: string
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
 }
 
 interface FileManagerModalProps {
@@ -33,13 +33,7 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
 
     const BUCKET_NAME = "media"
 
-    useEffect(() => {
-        if (open) {
-            fetchFiles()
-        }
-    }, [currentPath, open])
-
-    const fetchFiles = async () => {
+    const fetchFiles = useCallback(async () => {
         setLoading(true)
         try {
             const { data, error } = await supabase.storage
@@ -57,7 +51,15 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
         } finally {
             setLoading(false)
         }
-    }
+    }, [currentPath])
+
+    useEffect(() => {
+        if (open) {
+            fetchFiles()
+        }
+    }, [open, fetchFiles])
+
+
 
     const handleUpload = async (fileList: FileList) => {
         if (!fileList || fileList.length === 0) return
@@ -208,7 +210,7 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
                                 ))}
                                 {regularFiles.map((file) => {
                                     const url = getPublicUrl(file.name)
-                                    const isImage = file.metadata?.mimetype?.startsWith("image/") ||
+                                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/") ||
                                         file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
                                     const isSelected = selectedFile === file.name
 
@@ -251,7 +253,7 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
                                     </div>
                                 ))}
                                 {regularFiles.map((file) => {
-                                    const isImage = file.metadata?.mimetype?.startsWith("image/")
+                                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/")
                                     const isSelected = selectedFile === file.name
 
                                     return (
