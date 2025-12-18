@@ -57,14 +57,17 @@ export const FrontPageManager = () => {
                 onPublish={handlePublish}
                 headerPath="Front Page Builder"
                 overrides={{
-                    headerActions: ({ children }) => (
-                        <div className="flex gap-2">
-                            {children}
-                            {/* We could add generic preview button here if needed */}
-                        </div>
-                    )
+                    headerActions: HeaderActions
                 }}
             />
         </div>
     );
 };
+
+// Extract component outside parent to avoid recreation on each render
+const HeaderActions = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex gap-2">
+        {children}
+        {/* We could add generic preview button here if needed */}
+    </div>
+);
