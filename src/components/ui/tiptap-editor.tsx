@@ -1,4 +1,4 @@
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react'
 import 'highlight.js/styles/github-dark.css' // Syntax highlighting theme
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
@@ -24,6 +24,7 @@ import julia from 'highlight.js/lib/languages/julia'
 import sql from 'highlight.js/lib/languages/sql'
 import java from 'highlight.js/lib/languages/java'
 import kotlin from 'highlight.js/lib/languages/kotlin'
+import { CodeBlockComponent } from './CodeBlockComponent'
 
 import { Button } from "@/components/ui/button"
 import {
@@ -86,6 +87,10 @@ export const TiptapEditor = ({ content, onChange, placeholder = "Start typing...
             CodeBlockLowlight.configure({
                 lowlight,
                 defaultLanguage: 'javascript',
+            }).extend({
+                addNodeView() {
+                    return ReactNodeViewRenderer(CodeBlockComponent)
+                },
             }),
             Image,
             Link.configure({
