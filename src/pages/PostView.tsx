@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
+import { logger } from "@/lib/logger"
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, ArrowLeft, Edit } from "lucide-react"
+import { Calendar, ArrowLeft, Edit, Trash } from "lucide-react"
 import { TiptapRenderer } from "@/components/ui/TiptapRenderer"
 import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 interface Post {
     id: string
@@ -17,8 +21,10 @@ interface Post {
 
 export const PostView = () => {
     const { slug } = useParams<{ slug: string }>()
+    const navigate = useNavigate()
     const [post, setPost] = useState<Post | null>(null)
     const [loading, setLoading] = useState(true)
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
     const [toc, setToc] = useState<{ id: string, text: string, level: number }[]>([])
     const [processedContent, setProcessedContent] = useState("")
@@ -31,7 +37,10 @@ export const PostView = () => {
     }, [])
 
     useEffect(() => {
-        if (slug) fetchPost()
+        if (slug) {
+            logger.view("PostView", { slug })
+            fetchPost()
+        }
     }, [slug])
 
     useEffect(() => {
@@ -88,11 +97,30 @@ export const PostView = () => {
 
             // @ts-ignore
             setPost(data)
+            logger.api("PostView", "Fetch Success", { title: data.title })
         } catch (error) {
+            logger.error("PostView", "Fetch Failed", error)
             console.error("Error fetching post:", error)
             setPost(null)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        if (!post) return
+
+        try {
+            const { error } = await supabase.from("posts").delete().eq("id", post.id)
+            if (error) throw error
+
+            toast.success("Post deleted successfully")
+            logger.action("PostView", "Delete Post", { id: post.id, title: post.title })
+            navigate("/posts")
+        } catch (error: any) {
+            logger.error("PostView", "Delete Failed", error)
+            console.error("Error deleting post:", error)
+            toast.error(`Error deleting post: ${error.message}`)
         }
     }
 
@@ -151,6 +179,16 @@ export const PostView = () => {
                                         <Edit className="h-4 w-4" />
                                     </Button>
                                 </Link>
+                                <Button variant="destructive" size="icon" title="Delete Post" onClick={() => setShowDeleteDialog(true)} className="ml-2">
+                                    <Trash className="h-4 w-4" />
+                                </Button>
+                                <DeleteConfirmDialog
+                                    open={showDeleteDialog}
+                                    onOpenChange={setShowDeleteDialog}
+                                    onConfirm={handleDelete}
+                                    title="Delete Post"
+                                    description="Are you sure you want to delete this post? This action cannot be undone."
+                                />
                             </div>
                         )}
 

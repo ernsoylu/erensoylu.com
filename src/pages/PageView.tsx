@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
+import { logger } from "@/lib/logger"
+import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, ArrowLeft, Edit } from "lucide-react"
+import { Calendar, ArrowLeft, Edit, Trash } from "lucide-react"
 import { TiptapRenderer } from "@/components/ui/TiptapRenderer"
 import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 interface Page {
     id: string
@@ -17,8 +21,10 @@ interface Page {
 
 export const PageView = () => {
     const { slug } = useParams<{ slug: string }>()
+    const navigate = useNavigate()
     const [page, setPage] = useState<Page | null>(null)
     const [loading, setLoading] = useState(true)
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
     const [toc, setToc] = useState<{ id: string, text: string, level: number }[]>([])
     const [processedContent, setProcessedContent] = useState("")
@@ -31,7 +37,10 @@ export const PageView = () => {
     }, [])
 
     useEffect(() => {
-        if (slug) fetchPage()
+        if (slug) {
+            logger.view("PageView", { slug })
+            fetchPage()
+        }
     }, [slug])
 
     useEffect(() => {
@@ -77,10 +86,29 @@ export const PageView = () => {
             if (error) throw error
             // @ts-ignore
             setPage(data)
+            logger.api("PageView", "Fetch Success", { title: data.title })
         } catch (error) {
+            logger.error("PageView", "Fetch Failed", error)
             console.error("Error fetching page:", error)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        if (!page) return
+
+        try {
+            const { error } = await supabase.from("pages").delete().eq("id", page.id)
+            if (error) throw error
+
+            toast.success("Page deleted successfully")
+            logger.action("PageView", "Delete Page", { id: page.id, title: page.title })
+            navigate("/")
+        } catch (error: any) {
+            logger.error("PageView", "Delete Failed", error)
+            console.error("Error deleting page:", error)
+            toast.error(`Error deleting page: ${error.message}`)
         }
     }
 
@@ -139,6 +167,16 @@ export const PageView = () => {
                                         <Edit className="h-4 w-4" />
                                     </Button>
                                 </Link>
+                                <Button variant="destructive" size="icon" title="Delete Page" onClick={() => setShowDeleteDialog(true)} className="ml-2">
+                                    <Trash className="h-4 w-4" />
+                                </Button>
+                                <DeleteConfirmDialog
+                                    open={showDeleteDialog}
+                                    onOpenChange={setShowDeleteDialog}
+                                    onConfirm={handleDelete}
+                                    title="Delete Page"
+                                    description="Are you sure you want to delete this page? This action cannot be undone."
+                                />
                             </div>
                         )}
 

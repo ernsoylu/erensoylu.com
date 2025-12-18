@@ -68,7 +68,7 @@ export const PostGrid = ({ title, categorySlug, limit }: any) => {
                         <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
                             <div className="aspect-video w-full bg-muted/50 relative overflow-hidden">
                                 {post.image_url && <img src={post.image_url} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />}
-                                <Badge className="absolute top-2 left-2 bg-background/80 backdrop-blur">{post.category?.name}</Badge>
+                                {post.category?.name && <Badge className="absolute top-2 left-2 bg-yellow-500 hover:bg-yellow-600 text-black border-yellow-600/20 backdrop-blur-sm">{post.category.name}</Badge>}
                             </div>
                             <CardHeader className="p-4">
                                 <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">{post.title}</CardTitle>

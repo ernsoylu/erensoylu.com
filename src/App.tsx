@@ -1,4 +1,6 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { logger } from "@/lib/logger"
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { PostView } from './pages/PostView'
@@ -18,10 +20,43 @@ import { FrontPageManager } from './components/admin/FrontPageManager'
 import { Toaster } from "@/components/ui/sonner"
 
 
+const RouteLogger = () => {
+  const location = useLocation()
+
+  useEffect(() => {
+    logger.view('App', { path: location.pathname, search: location.search })
+  }, [location])
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      // @ts-ignore
+      const target = e.target as HTMLElement
+      const element = target.closest('button, a, input, [role="button"]') || target
+      // shorten innerText
+      const label = element.innerText?.substring(0, 30)?.replace(/\n/g, ' ') || element.getAttribute('aria-label') || element.tagName
+      logger.action('GlobalClick', `Clicked ${element.tagName}`, {
+        path: location.pathname,
+        label,
+        id: element.id,
+        className: element.className
+      })
+    }
+
+    if (logger.isEnabled) {
+      window.addEventListener('click', handleClick)
+    }
+    return () => window.removeEventListener('click', handleClick)
+  }, [location])
+
+  return null
+}
+
+
 function App() {
 
   return (
     <div>
+      <RouteLogger />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />

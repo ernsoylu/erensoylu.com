@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
+import { logger } from "@/lib/logger"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -97,11 +98,14 @@ export const PageManager = () => {
     }, [pages, searchParams, currentPageId, view])
 
     const fetchPages = async () => {
+        logger.api("PageManager", "Fetch Pages Start")
         try {
             const { data, error } = await supabase.from("pages").select("*").order("title")
             if (error) throw error
             setPages(data || [])
+            logger.api("PageManager", "Fetch Pages Success", { count: data?.length })
         } catch (error) {
+            logger.error("PageManager", "Fetch Pages Failed", error)
             console.error("Error fetching pages:", error)
         } finally {
             setLoading(false)
@@ -145,6 +149,7 @@ export const PageManager = () => {
     }
 
     const handleSaveDraft = async () => {
+        logger.action("PageManager", "Save Draft Start", { id: currentPageId })
         try {
             const dataToSave = {
                 title: formData.title,
@@ -162,6 +167,7 @@ export const PageManager = () => {
                 await fetchPages()
                 setSearchParams({ edit: data[0].id })
                 toast.success("Draft page saved")
+                logger.api("PageManager", "Save Draft (New) Success", { id: data[0].id })
             } else {
                 const page = pages.find(p => p.id === currentPageId)
                 if (page?.published) {
@@ -173,15 +179,18 @@ export const PageManager = () => {
                     if (error) throw error
                     toast.success("Draft revision saved")
                     setHasRemoteDraft(true)
+                    logger.api("PageManager", "Save Draft Revision Success", { id: currentPageId })
                 } else {
                     const { error } = await supabase.from("pages").update({ ...dataToSave, published: false }).eq("id", currentPageId)
                     if (error) throw error
                     toast.success("Draft saved")
+                    logger.api("PageManager", "Save Draft (Update) Success", { id: currentPageId })
                 }
             }
             setIsDirty(false)
             if (currentPageId) fetchPages()
         } catch (error: any) {
+            logger.error("PageManager", "Save Draft Failed", error)
             console.error("Error saving draft:", error)
             toast.error(`Error saving draft: ${error.message}`)
         }

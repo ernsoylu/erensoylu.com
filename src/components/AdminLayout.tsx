@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
+import { logger } from "@/lib/logger"
 import {
     LayoutDashboard,
     FileText,
@@ -20,7 +21,10 @@ export const AdminLayout = () => {
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
+                logger.action("AdminLayout", "Auth Check Failed", { redirect: "/login" })
                 navigate("/login")
+            } else {
+                logger.action("AdminLayout", "Auth Check Passed", { user: session.user.email })
             }
             setLoading(false)
         })
@@ -37,6 +41,7 @@ export const AdminLayout = () => {
     }, [navigate])
 
     const handleSignOut = async () => {
+        logger.action("AdminLayout", "Sign Out Initiated")
         await supabase.auth.signOut()
         navigate("/login")
     }
