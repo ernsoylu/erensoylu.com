@@ -498,16 +498,14 @@ export const FileManager = () => {
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
                 className={dragZoneClassName}
-                role="button"
-                tabIndex={0}
-                aria-label="File upload drop zone"
-                onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault()
-                        fileInputRef.current?.click()
-                    }
-                }}
             >
+                <button
+                    type="button"
+                    className="sr-only"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    Upload files
+                </button>
                 {content}
             </div>
 
