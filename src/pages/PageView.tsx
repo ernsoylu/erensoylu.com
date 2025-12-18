@@ -94,6 +94,13 @@ export const PageView = () => {
         setToc(tocItems)
     }
 
+    const getTocItemClassName = (level: number) => {
+        const baseClasses = 'text-sm hover:text-primary transition-colors block py-0.5 border-l-2 -ml-[13px] pl-3'
+        if (level === 1) return `${baseClasses} border-transparent font-medium text-foreground`
+        if (level === 2) return `${baseClasses} border-transparent pl-5 text-muted-foreground`
+        return `${baseClasses} border-transparent pl-7 text-muted-foreground/80`
+    }
+
     const handleDelete = async () => {
         if (!page) return
 
@@ -189,10 +196,7 @@ export const PageView = () => {
                                         <a
                                             key={item.id}
                                             href={`#${item.id}`}
-                                            className={`text-sm hover:text-primary transition-colors block py-0.5 border-l-2 -ml-[13px] pl-3 ${item.level === 1 ? 'border-transparent font-medium text-foreground' :
-                                                item.level === 2 ? 'border-transparent pl-5 text-muted-foreground' :
-                                                    'border-transparent pl-7 text-muted-foreground/80'
-                                                }`}
+                                            className={getTocItemClassName(item.level)}
                                             onClick={(e) => {
                                                 e.preventDefault()
                                                 document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
