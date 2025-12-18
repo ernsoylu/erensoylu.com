@@ -1,7 +1,7 @@
 export const logger = {
     isEnabled: import.meta.env.VITE_DEBUG === 'true',
 
-    log: (type: 'VIEW' | 'ACTION' | 'API' | 'ERROR', component: string, action: string, details?: Record<string, unknown> | unknown) => {
+    log: (type: 'VIEW' | 'ACTION' | 'API' | 'ERROR', component: string, action: string, details?: Record<string, unknown>) => {
         if (import.meta.env.VITE_DEBUG !== 'true') return;
 
 
@@ -28,7 +28,8 @@ export const logger = {
     action: (component: string, action: string, details?: Record<string, unknown>) => logger.log('ACTION', component, action, details),
     api: (component: string, action: string, details?: Record<string, unknown>) => logger.log('API', component, action, details),
     error: (component: string, action: string, error: unknown) => {
-        logger.log('ERROR', component, action, error);
+        const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack } : { error };
+        logger.log('ERROR', component, action, errorDetails);
         console.error(error); // Ensure stack trace is visible
     }
 };
