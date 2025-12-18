@@ -45,7 +45,6 @@ export const PageListView = () => {
             let query = supabase
                 .from("pages")
                 .select("*", { count: 'exact' })
-                .eq("published", true)
 
             // Filter: Search
             if (searchQuery) {

@@ -536,7 +536,6 @@ export const LatestPages = ({ title, limit }: any) => {
             const { data } = await supabase
                 .from("pages")
                 .select("*")
-                .eq("published", true)
                 .order("created_at", { ascending: false })
                 .limit(limit || 6);
             if (data) setPages(data);
