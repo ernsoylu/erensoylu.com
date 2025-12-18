@@ -1,9 +1,6 @@
-import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import { Home } from './pages/Home'
 
-import { AboutMe } from './pages/AboutMe'
-import { ContactMe } from './pages/ContactMe'
 import { Login } from './pages/Login'
 import { PostView } from './pages/PostView'
 import { PageView } from './pages/PageView'
@@ -25,8 +22,6 @@ function App() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<AboutMe />} />
-        <Route path="/contact" element={<ContactMe />} />
         <Route path="/login" element={<Login />} />
         <Route path="/post/:slug" element={<PostView />} />
         <Route path="/page/:slug" element={<PageView />} />
