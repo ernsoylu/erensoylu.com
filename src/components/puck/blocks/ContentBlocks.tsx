@@ -23,7 +23,13 @@ export const VideoEmbed = ({ title, videoUrl, description }: VideoEmbedProps) =>
             {title && <h2 className="text-3xl font-bold text-center mb-4">{title}</h2>}
             {description && <p className="text-center text-muted-foreground mb-8">{description}</p>}
             <div className="aspect-video rounded-2xl overflow-hidden bg-muted">
-                <iframe src={videoUrl} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                <iframe
+                    src={videoUrl}
+                    title={title || "Embedded video"}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                />
             </div>
         </div>
     </section>
@@ -75,9 +81,9 @@ export interface ImageGalleryProps {
 export const ImageGallery = ({ images, columns }: ImageGalleryProps) => (
     <section className="container mx-auto px-4 py-8">
         <div className={`grid gap-4`} style={{ gridTemplateColumns: `repeat(${columns || 3}, 1fr)` }}>
-            {images.map((img, idx) => (
-                <div key={idx} className="aspect-square rounded-lg overflow-hidden bg-muted group cursor-pointer">
-                    <img src={img.url} alt={img.caption || `Image ${idx + 1}`} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+            {images.map((img) => (
+                <div key={img.url} className="aspect-square rounded-lg overflow-hidden bg-muted group cursor-pointer">
+                    <img src={img.url} alt={img.caption || `Gallery image`} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                 </div>
             ))}
         </div>
