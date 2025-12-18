@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from '@tiptap/react'
+import 'highlight.js/styles/github-dark.css' // Syntax highlighting theme
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
@@ -10,6 +11,19 @@ import TaskItem from '@tiptap/extension-task-item'
 import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import Highlight from '@tiptap/extension-highlight'
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { createLowlight, common } from 'lowlight'
+import c from 'highlight.js/lib/languages/c'
+import cpp from 'highlight.js/lib/languages/cpp'
+import javascript from 'highlight.js/lib/languages/javascript'
+import typescript from 'highlight.js/lib/languages/typescript'
+import python from 'highlight.js/lib/languages/python'
+import go from 'highlight.js/lib/languages/go'
+import rust from 'highlight.js/lib/languages/rust'
+import julia from 'highlight.js/lib/languages/julia'
+import sql from 'highlight.js/lib/languages/sql'
+import java from 'highlight.js/lib/languages/java'
+import kotlin from 'highlight.js/lib/languages/kotlin'
 
 import { Button } from "@/components/ui/button"
 import {
@@ -41,6 +55,20 @@ import {
 import { useState, useCallback } from 'react'
 import { FileManagerModal } from '../admin/FileManagerModal'
 
+// Create lowlight instance and register languages
+const lowlight = createLowlight(common)
+lowlight.register('c', c)
+lowlight.register('cpp', cpp)
+lowlight.register('javascript', javascript)
+lowlight.register('typescript', typescript)
+lowlight.register('python', python)
+lowlight.register('go', go)
+lowlight.register('rust', rust)
+lowlight.register('julia', julia)
+lowlight.register('sql', sql)
+lowlight.register('java', java)
+lowlight.register('kotlin', kotlin)
+
 interface TiptapEditorProps {
     content: string
     onChange: (content: string) => void
@@ -52,7 +80,13 @@ export const TiptapEditor = ({ content, onChange, placeholder = "Start typing...
 
     const editor = useEditor({
         extensions: [
-            StarterKit,
+            StarterKit.configure({
+                codeBlock: false, // Disable default code block to use CodeBlockLowlight instead
+            }),
+            CodeBlockLowlight.configure({
+                lowlight,
+                defaultLanguage: 'javascript',
+            }),
             Image,
             Link.configure({
                 openOnClick: false,
