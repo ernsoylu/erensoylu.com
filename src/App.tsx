@@ -33,7 +33,7 @@ const RouteLogger = () => {
       const target = e.target as HTMLElement
       const element = target.closest('button, a, input, [role="button"]') || target
       // shorten innerText
-      const label = element.innerText?.substring(0, 30)?.replace(/\n/g, ' ') || element.getAttribute('aria-label') || element.tagName
+      const label = element.textContent?.substring(0, 30)?.replace(/\n/g, ' ') || element.getAttribute('aria-label') || element.tagName
       logger.action('GlobalClick', `Clicked ${element.tagName}`, {
         path: location.pathname,
         label,

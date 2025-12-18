@@ -4,7 +4,7 @@ export const logger = {
     log: (type: 'VIEW' | 'ACTION' | 'API' | 'ERROR', component: string, action: string, details?: any) => {
         if (import.meta.env.VITE_DEBUG !== 'true') return;
 
-        const timestamp = new Date().toISOString();
+
         const style = {
             VIEW: 'background: #2196F3; color: white; padding: 2px 5px; border-radius: 2px;',
             ACTION: 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 2px;',
@@ -12,13 +12,7 @@ export const logger = {
             ERROR: 'background: #F44336; color: white; padding: 2px 5px; border-radius: 2px;',
         };
 
-        const logEntry = {
-            timestamp,
-            type,
-            component,
-            action,
-            details,
-        };
+
 
         console.log(
             `%c${type}%c [${component}] ${action}`,

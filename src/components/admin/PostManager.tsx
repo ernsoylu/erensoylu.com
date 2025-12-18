@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
-import { logger } from "@/lib/logger"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,13 +19,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Trash2, Edit, Plus, ArrowLeft, Eye, ExternalLink, ShieldAlert } from "lucide-react"
+import { Trash2, Edit, Plus, ArrowLeft, Eye, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TiptapEditor } from "@/components/ui/tiptap-editor"
 import { FileManagerModal } from "./FileManagerModal"
 import { UnsavedChangesDialog } from "./UnsavedChangesDialog"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 
 interface Post {
@@ -70,9 +68,7 @@ export const PostManager = () => {
 
     // Draft & Dirty State
     const [isDirty, setIsDirty] = useState(false)
-    const [hasRemoteDraft, setHasRemoteDraft] = useState(false)
     const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
-    const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null)
 
     // Modal for featured image
     const [imageModalOpen, setImageModalOpen] = useState(false)
@@ -140,7 +136,7 @@ export const PostManager = () => {
             category_id: "none"
         })
         setIsDirty(false)
-        setHasRemoteDraft(false)
+        setIsDirty(false)
         setView("edit")
     }
 
@@ -210,7 +206,6 @@ export const PostManager = () => {
                     }).eq("id", currentPostId)
                     if (error) throw error
                     toast.success("Draft revision saved")
-                    setHasRemoteDraft(true)
                 } else {
                     // Just update the draft post
                     const { error } = await supabase.from("posts").update({ ...dataToSave, published: false }).eq("id", currentPostId)
@@ -264,7 +259,6 @@ export const PostManager = () => {
                 })
             }
             setIsDirty(false)
-            setHasRemoteDraft(false)
             if (currentPostId) fetchPosts()
         } catch (error: any) {
             console.error("Error publishing:", error)
@@ -432,9 +426,9 @@ export const PostManager = () => {
                 <UnsavedChangesDialog
                     open={showUnsavedDialog}
                     onOpenChange={setShowUnsavedDialog}
-                    onSaveDraft={() => { handleSaveDraft(); setShowUnsavedDialog(false); pendingNavigation?.(); }}
-                    onPublish={() => { handlePublish(); setShowUnsavedDialog(false); pendingNavigation?.(); }}
-                    onDiscard={() => { setIsDirty(false); setShowUnsavedDialog(false); pendingNavigation?.(); }}
+                    onSaveDraft={() => { handleSaveDraft(); setShowUnsavedDialog(false); }}
+                    onPublish={() => { handlePublish(); setShowUnsavedDialog(false); }}
+                    onDiscard={() => { setIsDirty(false); setShowUnsavedDialog(false); }}
                 />
 
                 <FileManagerModal

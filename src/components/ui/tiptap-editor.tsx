@@ -1,4 +1,4 @@
-import { useEditor, EditorContent, ReactNodeViewRenderer, mergeAttributes } from '@tiptap/react'
+import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react'
 import 'highlight.js/styles/github-dark.css' // Syntax highlighting theme
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'

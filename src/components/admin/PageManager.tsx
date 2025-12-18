@@ -13,13 +13,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Trash2, Edit, Plus, ArrowLeft, Eye, ExternalLink, ShieldAlert } from "lucide-react"
+import { Trash2, Edit, Plus, ArrowLeft, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TiptapEditor } from "@/components/ui/tiptap-editor"
 import { FileManagerModal } from "./FileManagerModal"
 import { UnsavedChangesDialog } from "./UnsavedChangesDialog"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface Page {
     id: string
@@ -53,10 +52,9 @@ export const PageManager = () => {
     })
 
     // Draft & Dirty State
+    // Draft & Dirty State
     const [isDirty, setIsDirty] = useState(false)
-    const [hasRemoteDraft, setHasRemoteDraft] = useState(false)
     const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
-    const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null)
 
     const [imageModalOpen, setImageModalOpen] = useState(false)
 
@@ -123,7 +121,7 @@ export const PageManager = () => {
             published: false
         })
         setIsDirty(false)
-        setHasRemoteDraft(false)
+        setIsDirty(false)
         setView("edit")
     }
 
@@ -178,7 +176,8 @@ export const PageManager = () => {
                     }).eq("id", currentPageId)
                     if (error) throw error
                     toast.success("Draft revision saved")
-                    setHasRemoteDraft(true)
+                    if (error) throw error
+                    toast.success("Draft revision saved")
                     logger.api("PageManager", "Save Draft Revision Success", { id: currentPageId })
                 } else {
                     const { error } = await supabase.from("pages").update({ ...dataToSave, published: false }).eq("id", currentPageId)
@@ -223,7 +222,7 @@ export const PageManager = () => {
                 toast.success("Page updated and published!")
             }
             setIsDirty(false)
-            setHasRemoteDraft(false)
+            setIsDirty(false)
             fetchPages()
         } catch (error: any) {
             console.error("Error publishing page:", error)
@@ -374,9 +373,9 @@ export const PageManager = () => {
                 <UnsavedChangesDialog
                     open={showUnsavedDialog}
                     onOpenChange={setShowUnsavedDialog}
-                    onSaveDraft={() => { handleSaveDraft(); setShowUnsavedDialog(false); pendingNavigation?.(); }}
-                    onPublish={() => { handlePublish(); setShowUnsavedDialog(false); pendingNavigation?.(); }}
-                    onDiscard={() => { setIsDirty(false); setShowUnsavedDialog(false); pendingNavigation?.(); }}
+                    onSaveDraft={() => { handleSaveDraft(); setShowUnsavedDialog(false); }}
+                    onPublish={() => { handlePublish(); setShowUnsavedDialog(false); }}
+                    onDiscard={() => { setIsDirty(false); setShowUnsavedDialog(false); }}
                 />
 
                 <FileManagerModal
