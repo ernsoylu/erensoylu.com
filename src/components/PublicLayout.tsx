@@ -5,7 +5,7 @@ export const PublicLayout = () => {
     return (
         <>
             <NavBar />
-            <div className="pt-16">
+            <div className="pt-24">
                 <Outlet />
             </div>
         </>
