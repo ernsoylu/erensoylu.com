@@ -342,7 +342,16 @@ export const FileManager = () => {
                                 key={folder.id}
                                 className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors ${dropTarget === folder.name ? 'ring-2 ring-primary bg-primary/10' : ''
                                     }`}
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => navigateToFolder(folder.name)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault()
+                                        navigateToFolder(folder.name)
+                                    }
+                                }}
+                                aria-label={`Open ${folder.name} folder`}
                                 draggable
                                 onDragStart={(e) => {
                                     e.stopPropagation()
@@ -430,7 +439,16 @@ export const FileManager = () => {
                             <div
                                 key={folder.id}
                                 className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer"
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => navigateToFolder(folder.name)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault()
+                                        navigateToFolder(folder.name)
+                                    }
+                                }}
+                                aria-label={`Open ${folder.name} folder`}
                             >
                                 <FolderOpen className="w-5 h-5 text-primary" />
                                 <span className="flex-1">{folder.name}</span>

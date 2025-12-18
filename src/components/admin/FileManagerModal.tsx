@@ -200,7 +200,16 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
                                     <Card
                                         key={folder.id}
                                         className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={() => navigateToFolder(folder.name)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault()
+                                                navigateToFolder(folder.name)
+                                            }
+                                        }}
+                                        aria-label={`Open ${folder.name} folder`}
                                     >
                                         <div className="flex flex-col items-center gap-2">
                                             <FolderOpen className="w-12 h-12 text-primary" />
@@ -246,7 +255,16 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
                                     <div
                                         key={folder.id}
                                         className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer"
+                                        role="button"
+                                        tabIndex={0}
                                         onClick={() => navigateToFolder(folder.name)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault()
+                                                navigateToFolder(folder.name)
+                                            }
+                                        }}
+                                        aria-label={`Open ${folder.name} folder`}
                                     >
                                         <FolderOpen className="w-5 h-5 text-primary" />
                                         <span className="flex-1">{folder.name}</span>
