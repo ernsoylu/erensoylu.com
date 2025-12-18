@@ -12,9 +12,15 @@ export interface DividerProps {
     style: 'solid' | 'dashed' | 'dotted';
 }
 
+const getBorderStyle = (style: 'solid' | 'dashed' | 'dotted') => {
+    if (style === 'dashed') return 'border-dashed'
+    if (style === 'dotted') return 'border-dotted'
+    return ''
+}
+
 export const Divider = ({ style }: DividerProps) => (
     <div className="container mx-auto px-4 py-8">
-        <hr className={style === 'dashed' ? 'border-dashed' : style === 'dotted' ? 'border-dotted' : ''} />
+        <hr className={getBorderStyle(style)} />
     </div>
 );
 

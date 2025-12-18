@@ -124,16 +124,19 @@ export const LatestPages = ({ title, limit }: LatestPagesProps) => {
         fetchPages();
     }, [limit]);
 
-    return (
-        <section className="container mx-auto px-4 py-12">
-            {title && <h2 className="text-3xl font-bold mb-8 text-center">{title}</h2>}
-            {loading ? (
+    const renderContent = () => {
+        if (loading) {
+            return (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3].map(i => (
                         <div key={i} className="h-48 bg-muted rounded-xl animate-pulse" />
                     ))}
                 </div>
-            ) : pages.length > 0 ? (
+            )
+        }
+
+        if (pages.length > 0) {
+            return (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pages.map((page) => (
                         <Link key={page.id} to={`/page/${page.slug}`} className="group">
@@ -150,14 +153,23 @@ export const LatestPages = ({ title, limit }: LatestPagesProps) => {
                         </Link>
                     ))}
                 </div>
-            ) : (
-                <div className="text-center py-12 bg-muted/30 rounded-2xl border-dashed border-2">
-                    <p className="text-muted-foreground">No published pages yet. Create some pages in the admin panel!</p>
-                    <Button asChild variant="link" className="mt-2">
-                        <Link to="/admin/pages">Go to Page Manager</Link>
-                    </Button>
-                </div>
-            )}
+            )
+        }
+
+        return (
+            <div className="text-center py-12 bg-muted/30 rounded-2xl border-dashed border-2">
+                <p className="text-muted-foreground">No published pages yet. Create some pages in the admin panel!</p>
+                <Button asChild variant="link" className="mt-2">
+                    <Link to="/admin/pages">Go to Page Manager</Link>
+                </Button>
+            </div>
+        )
+    }
+
+    return (
+        <section className="container mx-auto px-4 py-12">
+            {title && <h2 className="text-3xl font-bold mb-8 text-center">{title}</h2>}
+            {renderContent()}
         </section>
     );
 };

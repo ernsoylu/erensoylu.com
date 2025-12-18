@@ -54,16 +54,15 @@ export const LinkSelectorModal = ({ open, onOpenChange, onSelect }: LinkSelector
 
     const handleApply = () => {
         if (activeTab === "url") {
-            if (urlInput) {
-                onSelect(urlInput)
-                onOpenChange(false)
-            }
-        } else {
-            if (selectedItem) {
-                onSelect(selectedItem.path, selectedItem.label)
-                onOpenChange(false)
-            }
+            if (!urlInput) return
+            onSelect(urlInput)
+            onOpenChange(false)
+            return
         }
+
+        if (!selectedItem) return
+        onSelect(selectedItem.path, selectedItem.label)
+        onOpenChange(false)
     }
 
     if (!open) return null
