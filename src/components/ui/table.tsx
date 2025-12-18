@@ -2,7 +2,19 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({ className, children, ...props }: React.ComponentProps<"table">) {
+  const hasHeader = (() => {
+    const containsThead = (node: React.ReactNode): boolean => {
+      return React.Children.toArray(node).some((child) => {
+        if (!React.isValidElement(child)) return false
+        if (child.type === "thead" || child.type === TableHeader) return true
+        const childProps = child.props as { children?: React.ReactNode } | null | undefined
+        return containsThead(childProps?.children)
+      })
+    }
+    return containsThead(children)
+  })()
+
   return (
     <div
       data-slot="table-container"
@@ -12,7 +24,16 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
         data-slot="table"
         className={cn("w-full caption-bottom text-sm", className)}
         {...props}
-      />
+      >
+        {!hasHeader && (
+          <thead className="sr-only">
+            <tr>
+              <th scope="col">Content</th>
+            </tr>
+          </thead>
+        )}
+        {children}
+      </table>
     </div>
   )
 }

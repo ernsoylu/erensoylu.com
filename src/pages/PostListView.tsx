@@ -41,7 +41,7 @@ export const PostListView = () => {
     const [posts, setPosts] = useState<Post[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [loading, setLoading] = useState(true)
-    const [totalcount, setTotalCount] = useState(0)
+    const [totalCount, setTotalCount] = useState(0)
 
     // Filters
     const searchQuery = searchParams.get("s") || ""
@@ -62,29 +62,36 @@ export const PostListView = () => {
         const fetchPosts = async () => {
             setLoading(true)
             try {
+                const isAllCategories = categorySlug === "all"
+                let categoryId: string | null = null
+
+                if (!isAllCategories) {
+                    const { data: category, error: categoryError } = await supabase
+                        .from("categories")
+                        .select("id")
+                        .eq("slug", categorySlug)
+                        .single()
+
+                    if (categoryError || !category?.id) {
+                        setPosts([])
+                        setTotalCount(0)
+                        return
+                    }
+
+                    categoryId = category.id
+                }
+
                 let query = supabase
                     .from("posts")
                     .select("*, category:categories(name, slug)", { count: 'exact' })
                     .eq("published", true)
 
-                // Filter: Category
-                if (categorySlug !== "all") {
-                    query = query.eq("category.slug", categorySlug)
-                }
+                if (categoryId) query = query.eq("category_id", categoryId)
+                if (searchQuery) query = query.ilike("title", `%${searchQuery}%`)
 
-                // Filter: Search
-                if (searchQuery) {
-                    query = query.ilike("title", `%${searchQuery}%`)
-                }
-
-                // Sort
-                if (sortOrder === "newest") {
-                    query = query.order("created_at", { ascending: false })
-                } else if (sortOrder === "oldest") {
-                    query = query.order("created_at", { ascending: true })
-                } else if (sortOrder === "az") {
-                    query = query.order("title", { ascending: true })
-                }
+                if (sortOrder === "newest") query = query.order("created_at", { ascending: false })
+                else if (sortOrder === "oldest") query = query.order("created_at", { ascending: true })
+                else if (sortOrder === "az") query = query.order("title", { ascending: true })
 
                 // Pagination
                 const from = (page - 1) * PAGE_SIZE
@@ -92,58 +99,13 @@ export const PostListView = () => {
                 query = query.range(from, to)
 
                 const { data, error, count } = await query
-
                 if (error) {
-                    if (categorySlug !== 'all' && error.message.includes("could not find table")) {
-                        const catRes = await supabase.from("categories").select("id").eq("slug", categorySlug).single()
-                        if (catRes.data) {
-                            let retryQuery = supabase
-                                .from("posts")
-                                .select("*, category:categories(name, slug)", { count: 'exact' })
-                                .eq("published", true)
-                                .eq("category_id", catRes.data.id)
-
-                            if (searchQuery) retryQuery = retryQuery.ilike("title", `%${searchQuery}%`)
-                            if (sortOrder === "newest") retryQuery = retryQuery.order("created_at", { ascending: false })
-                            else if (sortOrder === "oldest") retryQuery = retryQuery.order("created_at", { ascending: true })
-
-                            retryQuery = retryQuery.range(from, to)
-                            const retryRes = await retryQuery
-                            setPosts(retryRes.data || [])
-                            setTotalCount(retryRes.count || 0)
-                        }
-                    } else {
-                        console.error("Error fetching posts:", error)
-                    }
-                } else {
-                    if (categorySlug !== 'all') {
-                        const catRes = await supabase.from("categories").select("id").eq("slug", categorySlug).single()
-                        if (catRes.data) {
-                            let cleanQuery = supabase
-                                .from("posts")
-                                .select("*, category:categories(name, slug)", { count: 'exact' })
-                                .eq("published", true)
-                                .eq("category_id", catRes.data.id)
-
-                            if (searchQuery) cleanQuery = cleanQuery.ilike("title", `%${searchQuery}%`)
-
-                            if (sortOrder === "newest") cleanQuery = cleanQuery.order("created_at", { ascending: false })
-                            else if (sortOrder === "oldest") cleanQuery = cleanQuery.order("created_at", { ascending: true })
-                            else if (sortOrder === "az") cleanQuery = cleanQuery.order("title", { ascending: true })
-
-                            cleanQuery = cleanQuery.range(from, to)
-                            const res = await cleanQuery
-                            setPosts(res.data || [])
-                            setTotalCount(res.count || 0)
-                        } else {
-                            setPosts([])
-                            setTotalCount(0)
-                        }
-                    } else {
-                        setPosts(data || [])
-                        setTotalCount(count || 0)
-                    }
+                    console.error("Error fetching posts:", error)
+                    return
                 }
+
+                setPosts(data || [])
+                setTotalCount(count || 0)
             } catch (err) {
                 console.error(err)
             } finally {
@@ -165,6 +127,77 @@ export const PostListView = () => {
         if (key !== 'page') newParams.set('page', '1')
 
         setSearchParams(newParams)
+    }
+
+    const headerTitle = categorySlug === 'all'
+        ? "All Posts"
+        : `${categories.find(c => c.slug === categorySlug)?.name || 'Category'} Posts`
+
+    let postsGrid: React.ReactNode
+    if (loading) {
+        postsGrid = (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                    <div key={i} className="h-64 bg-muted rounded-xl animate-pulse" />
+                ))}
+            </div>
+        )
+    } else if (posts.length > 0) {
+        postsGrid = (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {posts.map(post => (
+                    <Link key={post.id} to={`/post/${post.slug}`} className="group">
+                        <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
+                            <div className="aspect-video w-full overflow-hidden bg-muted/50 relative">
+                                {post.image_url ? (
+                                    <img
+                                        src={post.image_url}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        loading="lazy"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
+                                        <Badge variant="outline">No Image</Badge>
+                                    </div>
+                                )}
+                                {post.category && (
+                                    <Badge className="absolute top-2 left-2 bg-background/80 backdrop-blur text-foreground hover:bg-background/90">
+                                        {post.category.name}
+                                    </Badge>
+                                )}
+                            </div>
+                            <CardHeader className="p-4">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                    <Calendar className="w-3 h-3" />
+                                    {new Date(post.created_at).toLocaleDateString()}
+                                </div>
+                                <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
+                                    {post.title}
+                                </CardTitle>
+                                <CardDescription className="line-clamp-2 mt-2">
+                                    {post.excerpt}
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                ))}
+            </div>
+        )
+    } else {
+        postsGrid = (
+            <div className="text-center py-20 bg-muted/30 rounded-2xl border-dashed border-2">
+                <h3 className="text-lg font-medium">No posts found</h3>
+                <p className="text-muted-foreground">Try adjusting your filters</p>
+                <Button
+                    variant="link"
+                    onClick={() => setSearchParams(new URLSearchParams())}
+                    className="mt-2"
+                >
+                    Clear all filters
+                </Button>
+            </div>
+        )
     }
 
     return (
@@ -215,12 +248,7 @@ export const PostListView = () => {
                 <div className="flex-1 space-y-6">
                     {/* Header & Sort */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            {categorySlug !== 'all'
-                                ? `${categories.find(c => c.slug === categorySlug)?.name || 'Category'} Posts`
-                                : "All Posts"
-                            }
-                        </h1>
+                        <h1 className="text-3xl font-bold tracking-tight">{headerTitle}</h1>
                         <Select value={sortOrder} onValueChange={(val) => updateFilter("sort", val)}>
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Sort by" />
@@ -234,68 +262,10 @@ export const PostListView = () => {
                     </div>
 
                     {/* Post Grid */}
-                    {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
-                                <div key={i} className="h-64 bg-muted rounded-xl animate-pulse" />
-                            ))}
-                        </div>
-                    ) : posts.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {posts.map(post => (
-                                <Link key={post.id} to={`/post/${post.slug}`} className="group">
-                                    <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
-                                        <div className="aspect-video w-full overflow-hidden bg-muted/50 relative">
-                                            {post.image_url ? (
-                                                <img
-                                                    src={post.image_url}
-                                                    alt={post.title}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                    loading="lazy"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
-                                                    <Badge variant="outline">No Image</Badge>
-                                                </div>
-                                            )}
-                                            {post.category && (
-                                                <Badge className="absolute top-2 left-2 bg-background/80 backdrop-blur text-foreground hover:bg-background/90">
-                                                    {post.category.name}
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <CardHeader className="p-4">
-                                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                                <Calendar className="w-3 h-3" />
-                                                {new Date(post.created_at).toLocaleDateString()}
-                                            </div>
-                                            <CardTitle className="text-lg leading-tight group-hover:text-primary transition-colors">
-                                                {post.title}
-                                            </CardTitle>
-                                            <CardDescription className="line-clamp-2 mt-2">
-                                                {post.excerpt}
-                                            </CardDescription>
-                                        </CardHeader>
-                                    </Card>
-                                </Link>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-20 bg-muted/30 rounded-2xl border-dashed border-2">
-                            <h3 className="text-lg font-medium">No posts found</h3>
-                            <p className="text-muted-foreground">Try adjusting your filters</p>
-                            <Button
-                                variant="link"
-                                onClick={() => setSearchParams(new URLSearchParams())}
-                                className="mt-2"
-                            >
-                                Clear all filters
-                            </Button>
-                        </div>
-                    )}
+                    {postsGrid}
 
                     {/* Pagination */}
-                    {totalcount > PAGE_SIZE && (
+                    {totalCount > PAGE_SIZE && (
                         <div className="flex justify-center gap-2 pt-4">
                             <Button
                                 variant="outline"
@@ -305,11 +275,11 @@ export const PostListView = () => {
                                 Previous
                             </Button>
                             <div className="flex items-center px-4 text-sm font-medium">
-                                Page {page} of {Math.ceil(totalcount / PAGE_SIZE)}
+                                Page {page} of {Math.ceil(totalCount / PAGE_SIZE)}
                             </div>
                             <Button
                                 variant="outline"
-                                disabled={page >= Math.ceil(totalcount / PAGE_SIZE)}
+                                disabled={page >= Math.ceil(totalCount / PAGE_SIZE)}
                                 onClick={() => updateFilter("page", (page + 1).toString())}
                             >
                                 Next

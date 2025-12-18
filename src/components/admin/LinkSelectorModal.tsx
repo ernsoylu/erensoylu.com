@@ -67,6 +67,55 @@ export const LinkSelectorModal = ({ open, onOpenChange, onSelect }: LinkSelector
 
     if (!open) return null
 
+    let mainContent: React.ReactNode
+    if (activeTab === "url") {
+        mainContent = (
+            <div className="space-y-4 max-w-lg mx-auto mt-8">
+                <div className="space-y-2">
+                    <Label>Destination URL</Label>
+                    <Input
+                        placeholder="https://example.com"
+                        value={urlInput}
+                        onChange={(e) => setUrlInput(e.target.value)}
+                        autoFocus
+                    />
+                    <p className="text-xs text-muted-foreground">Enter external links (starting with http://) or internal paths (starting with /).</p>
+                </div>
+            </div>
+        )
+    } else if (loading) {
+        mainContent = <div className="text-center py-8 text-muted-foreground">Loading contents...</div>
+    } else if (filteredContent.length === 0) {
+        mainContent = <div className="text-center py-8 text-muted-foreground">No matches found.</div>
+    } else {
+        mainContent = (
+            <div className="space-y-2">
+                {filteredContent.map(item => {
+                    const path = activeTab === "post" ? `/post/${item.slug}` : `/page/${item.slug}`
+                    const isSelected = selectedItem?.path === path
+
+                    return (
+                        <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => setSelectedItem({ path, label: item.title })}
+                            className={`w-full text-left p-3 rounded-lg border hover:border-primary transition-all ${isSelected ? "border-primary bg-primary/5 ring-1 ring-primary" : "bg-card"}`}
+                            aria-pressed={isSelected}
+                        >
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <div className="font-medium text-sm">{item.title}</div>
+                                    <div className="text-xs text-muted-foreground mt-1">{new Date(item.created_at).toLocaleDateString()}</div>
+                                </div>
+                                <div className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground font-mono truncate max-w-[150px]">{path}</div>
+                            </div>
+                        </button>
+                    )
+                })}
+            </div>
+        )
+    }
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-background w-full max-w-4xl rounded-xl shadow-2xl border flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -123,49 +172,7 @@ export const LinkSelectorModal = ({ open, onOpenChange, onSelect }: LinkSelector
 
                         {/* Content List or URL Input */}
                         <div className="flex-1 overflow-y-auto p-4">
-                            {activeTab === "url" ? (
-                                <div className="space-y-4 max-w-lg mx-auto mt-8">
-                                    <div className="space-y-2">
-                                        <Label>Destination URL</Label>
-                                        <Input
-                                            placeholder="https://example.com"
-                                            value={urlInput}
-                                            onChange={(e) => setUrlInput(e.target.value)}
-                                            autoFocus
-                                        />
-                                        <p className="text-xs text-muted-foreground">Enter external links (starting with http://) or internal paths (starting with /).</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    {loading ? (
-                                        <div className="text-center py-8 text-muted-foreground">Loading contents...</div>
-                                    ) : filteredContent.length === 0 ? (
-                                        <div className="text-center py-8 text-muted-foreground">No matches found.</div>
-                                    ) : (
-                                        filteredContent.map(item => {
-                                            const path = activeTab === "post" ? `/post/${item.slug}` : `/page/${item.slug}`
-                                            const isSelected = selectedItem?.path === path
-
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    onClick={() => setSelectedItem({ path, label: item.title })}
-                                                    className={`p-3 rounded-lg border cursor-pointer hover:border-primary transition-all ${isSelected ? "border-primary bg-primary/5 ring-1 ring-primary" : "bg-card"}`}
-                                                >
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <div className="font-medium text-sm">{item.title}</div>
-                                                            <div className="text-xs text-muted-foreground mt-1">{new Date(item.created_at).toLocaleDateString()}</div>
-                                                        </div>
-                                                        <div className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground font-mono truncate max-w-[150px]">{path}</div>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })
-                                    )}
-                                </div>
-                            )}
+                            {mainContent}
                         </div>
 
                         {/* Footer Actions */}

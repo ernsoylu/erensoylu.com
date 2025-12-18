@@ -3,6 +3,14 @@ export interface TableBlockProps {
     rows: { cells: string | string[] }[];
 }
 
+const hashString = (input: string) => {
+    let hash = 5381
+    for (let i = 0; i < input.length; i++) {
+        hash = (hash * 33) ^ input.charCodeAt(i)
+    }
+    return (hash >>> 0).toString(36)
+}
+
 export const TableBlock = ({ headers, rows }: TableBlockProps) => {
     const headerArray = typeof headers === 'string' ? headers.split(',').map((h: string) => h.trim()) : headers;
     const rowsArray = rows.map((row) => {
@@ -24,13 +32,22 @@ export const TableBlock = ({ headers, rows }: TableBlockProps) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {rowsArray.map((cells: string[], rowIdx: number) => (
-                            <tr key={`row-${rowIdx}`} className="border-b hover:bg-muted/50">
-                                {cells.map((cell: string, cellIdx: number) => (
-                                    <td key={`${rowIdx}-${cellIdx}`} className="p-3">{cell}</td>
-                                ))}
-                            </tr>
-                        ))}
+                        {rowsArray.map((cells: string[]) => {
+                            const rowKey = hashString(cells.join("\u0001"))
+                            const cellCounts = new Map<string, number>()
+
+                            return (
+                                <tr key={rowKey} className="border-b hover:bg-muted/50">
+                                    {cells.map((cell: string) => {
+                                        const nextCount = (cellCounts.get(cell) || 0) + 1
+                                        cellCounts.set(cell, nextCount)
+                                        const cellKey = hashString(`${rowKey}:${cell}:${nextCount}`)
+
+                                        return <td key={cellKey} className="p-3">{cell}</td>
+                                    })}
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>

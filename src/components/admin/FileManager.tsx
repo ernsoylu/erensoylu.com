@@ -74,8 +74,7 @@ export const FileManager = () => {
 
         setUploading(true)
         try {
-            for (let i = 0; i < fileList.length; i++) {
-                const file = fileList[i]
+            for (const file of fileList) {
                 // Preserve original filename, but add timestamp prefix to avoid conflicts
                 const timestamp = Date.now()
                 const fileName = `${timestamp}_${file.name}`
@@ -256,6 +255,172 @@ export const FileManager = () => {
 
     if (loading) return <div className="flex items-center justify-center h-64">Loading files...</div>
 
+    const dragZoneClassName = `min-h-[400px] border-2 border-dashed rounded-lg p-4 transition-colors ${dragActive ? 'border-primary bg-primary/5' : 'border-border'
+        }`
+
+    let content: React.ReactNode
+    if (filteredFiles.length === 0) {
+        content = (
+            <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+                <Upload className="w-12 h-12 mb-4" />
+                <p>Drop files here or click Upload</p>
+            </div>
+        )
+    } else if (viewMode === 'grid') {
+        content = (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {folders.map((folder) => (
+                    <button
+                        key={folder.id}
+                        type="button"
+                        className={`bg-card text-card-foreground rounded-xl border shadow-sm p-4 hover:bg-muted/50 transition-colors ${dropTarget === folder.name ? 'ring-2 ring-primary bg-primary/10' : ''
+                            }`}
+                        onClick={() => navigateToFolder(folder.name)}
+                        aria-label={`Open ${folder.name} folder`}
+                        draggable
+                        onDragStart={(e) => {
+                            e.stopPropagation()
+                            setDraggedItem(folder.name)
+                        }}
+                        onDragOver={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setDropTarget(folder.name)
+                        }}
+                        onDragLeave={() => setDropTarget(null)}
+                        onDrop={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            if (draggedItem && draggedItem !== folder.name) {
+                                const targetPath = currentPath ? `${currentPath}/${folder.name}` : folder.name
+                                moveItem(draggedItem, targetPath)
+                            }
+                            setDraggedItem(null)
+                            setDropTarget(null)
+                        }}
+                    >
+                        <div className="flex flex-col items-center gap-2">
+                            <FolderOpen className="w-12 h-12 text-primary" />
+                            <span className="text-sm truncate w-full text-center">{folder.name}</span>
+                        </div>
+                    </button>
+                ))}
+                {regularFiles.map((file) => {
+                    const url = getPublicUrl(file.name)
+                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/") ||
+                        file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+                    const isSelected = selectedFiles.has(file.name)
+
+                    return (
+                        <Card
+                            key={file.id}
+                            className={`group relative overflow-hidden transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}
+                            draggable
+                            onDragStart={(e) => {
+                                e.stopPropagation()
+                                setDraggedItem(file.name)
+                            }}
+                        >
+                            <div
+                                className="aspect-square bg-muted flex items-center justify-center cursor-pointer"
+                                role="checkbox"
+                                aria-checked={isSelected}
+                                tabIndex={0}
+                                aria-label={`${isSelected ? "Deselect" : "Select"} ${file.name}`}
+                                onClick={() => toggleFileSelection(file.name)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault()
+                                        toggleFileSelection(file.name)
+                                    }
+                                }}
+                            >
+                                {isImage ? (
+                                    <img src={url} alt={file.name} className="object-cover w-full h-full" />
+                                ) : (
+                                    <File className="w-12 h-12 text-muted-foreground" />
+                                )}
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <Button size="icon" variant="secondary" onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleCopyUrl(url, file.id)
+                                    }}>
+                                        {copiedId === file.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                    </Button>
+                                    <Button size="icon" variant="secondary" onClick={(e) => {
+                                        e.stopPropagation()
+                                        window.open(url, '_blank')
+                                    }}>
+                                        <Download className="w-4 h-4" />
+                                    </Button>
+                                    <Button size="icon" variant="destructive" onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleDelete(file.name)
+                                    }}>
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-2">
+                                <div className="text-xs truncate" title={file.name}>{file.name}</div>
+                            </div>
+                        </Card>
+                    )
+                })}
+            </div>
+        )
+    } else {
+        content = (
+            <div className="space-y-1">
+                {folders.map((folder) => (
+                    <button
+                        key={folder.id}
+                        type="button"
+                        className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg text-left"
+                        onClick={() => navigateToFolder(folder.name)}
+                        aria-label={`Open ${folder.name} folder`}
+                    >
+                        <FolderOpen className="w-5 h-5 text-primary" />
+                        <span className="flex-1">{folder.name}</span>
+                    </button>
+                ))}
+                {regularFiles.map((file) => {
+                    const url = getPublicUrl(file.name)
+                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/")
+                    const isSelected = selectedFiles.has(file.name)
+
+                    return (
+                        <div
+                            key={file.id}
+                            className={`flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg ${isSelected ? 'bg-primary/10' : ''
+                                }`}
+                        >
+                            <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleFileSelection(file.name)}
+                                className="w-4 h-4"
+                            />
+                            {isImage ? <ImageIcon className="w-5 h-5" /> : <File className="w-5 h-5" />}
+                            <span className="flex-1 truncate">{file.name}</span>
+                            <div className="flex gap-1">
+                                <Button size="icon" variant="ghost" onClick={() => handleCopyUrl(url, file.id)}>
+                                    {copiedId === file.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                </Button>
+                                <Button size="icon" variant="ghost" onClick={() => window.open(url, '_blank')}>
+                                    <Download className="w-4 h-4" />
+                                </Button>
+                                <Button size="icon" variant="ghost" onClick={() => handleDelete(file.name)}>
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+        )
+    }
+
     return (
         <div className="space-y-4">
             {/* Header */}
@@ -327,168 +492,9 @@ export const FileManager = () => {
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
-                className={`min-h-[400px] border-2 border-dashed rounded-lg p-4 transition-colors ${dragActive ? 'border-primary bg-primary/5' : 'border-border'
-                    }`}
+                className={dragZoneClassName}
             >
-                {filteredFiles.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-                        <Upload className="w-12 h-12 mb-4" />
-                        <p>Drop files here or click Upload</p>
-                    </div>
-                ) : viewMode === 'grid' ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        {folders.map((folder) => (
-                            <Card
-                                key={folder.id}
-                                className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors ${dropTarget === folder.name ? 'ring-2 ring-primary bg-primary/10' : ''
-                                    }`}
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => navigateToFolder(folder.name)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault()
-                                        navigateToFolder(folder.name)
-                                    }
-                                }}
-                                aria-label={`Open ${folder.name} folder`}
-                                draggable
-                                onDragStart={(e) => {
-                                    e.stopPropagation()
-                                    setDraggedItem(folder.name)
-                                }}
-                                onDragOver={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    setDropTarget(folder.name)
-                                }}
-                                onDragLeave={() => setDropTarget(null)}
-                                onDrop={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    if (draggedItem && draggedItem !== folder.name) {
-                                        const targetPath = currentPath ? `${currentPath}/${folder.name}` : folder.name
-                                        moveItem(draggedItem, targetPath)
-                                    }
-                                    setDraggedItem(null)
-                                    setDropTarget(null)
-                                }}
-                            >
-                                <div className="flex flex-col items-center gap-2">
-                                    <FolderOpen className="w-12 h-12 text-primary" />
-                                    <span className="text-sm truncate w-full text-center">{folder.name}</span>
-                                </div>
-                            </Card>
-                        ))}
-                        {regularFiles.map((file) => {
-                            const url = getPublicUrl(file.name)
-                            const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/") ||
-                                file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-                            const isSelected = selectedFiles.has(file.name)
-
-                            return (
-                                <Card
-                                    key={file.id}
-                                    className={`group relative overflow-hidden transition-all ${isSelected ? 'ring-2 ring-primary' : ''}`}
-                                    draggable
-                                    onDragStart={(e) => {
-                                        e.stopPropagation()
-                                        setDraggedItem(file.name)
-                                    }}
-                                >
-                                    <div
-                                        className="aspect-square bg-muted flex items-center justify-center cursor-pointer"
-                                        onClick={() => toggleFileSelection(file.name)}
-                                    >
-                                        {isImage ? (
-                                            <img src={url} alt={file.name} className="object-cover w-full h-full" />
-                                        ) : (
-                                            <File className="w-12 h-12 text-muted-foreground" />
-                                        )}
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                            <Button size="icon" variant="secondary" onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleCopyUrl(url, file.id)
-                                            }}>
-                                                {copiedId === file.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                            </Button>
-                                            <Button size="icon" variant="secondary" onClick={(e) => {
-                                                e.stopPropagation()
-                                                window.open(url, '_blank')
-                                            }}>
-                                                <Download className="w-4 h-4" />
-                                            </Button>
-                                            <Button size="icon" variant="destructive" onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleDelete(file.name)
-                                            }}>
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className="p-2">
-                                        <div className="text-xs truncate" title={file.name}>{file.name}</div>
-                                    </div>
-                                </Card>
-                            )
-                        })}
-                    </div>
-                ) : (
-                    <div className="space-y-1">
-                        {folders.map((folder) => (
-                            <div
-                                key={folder.id}
-                                className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer"
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => navigateToFolder(folder.name)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault()
-                                        navigateToFolder(folder.name)
-                                    }
-                                }}
-                                aria-label={`Open ${folder.name} folder`}
-                            >
-                                <FolderOpen className="w-5 h-5 text-primary" />
-                                <span className="flex-1">{folder.name}</span>
-                            </div>
-                        ))}
-                        {regularFiles.map((file) => {
-                            const url = getPublicUrl(file.name)
-                            const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/")
-                            const isSelected = selectedFiles.has(file.name)
-
-                            return (
-                                <div
-                                    key={file.id}
-                                    className={`flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg ${isSelected ? 'bg-primary/10' : ''
-                                        }`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={isSelected}
-                                        onChange={() => toggleFileSelection(file.name)}
-                                        className="w-4 h-4"
-                                    />
-                                    {isImage ? <ImageIcon className="w-5 h-5" /> : <File className="w-5 h-5" />}
-                                    <span className="flex-1 truncate">{file.name}</span>
-                                    <div className="flex gap-1">
-                                        <Button size="icon" variant="ghost" onClick={() => handleCopyUrl(url, file.id)}>
-                                            {copiedId === file.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                        </Button>
-                                        <Button size="icon" variant="ghost" onClick={() => window.open(url, '_blank')}>
-                                            <Download className="w-4 h-4" />
-                                        </Button>
-                                        <Button size="icon" variant="ghost" onClick={() => handleDelete(file.name)}>
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                )}
+                {content}
             </div>
 
             {/* Create Folder Dialog */}

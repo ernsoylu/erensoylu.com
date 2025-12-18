@@ -1,7 +1,7 @@
 
 import { createClient } from "@supabase/supabase-js"
-import fs from "fs"
-import path from "path"
+import fs from "node:fs"
+import path from "node:path"
 
 const envPath = path.resolve(process.cwd(), ".env")
 const envContent = fs.readFileSync(envPath, "utf-8")
@@ -24,21 +24,17 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-async function check() {
-    console.log("Checking Pages...")
-    const { data: pages, error: pageError } = await supabase
-        .from("pages")
-        .select("id, title, slug")
-        .ilike("title", "%About%")
+console.log("Checking Pages...")
+const { data: pages, error: pageError } = await supabase
+    .from("pages")
+    .select("id, title, slug")
+    .ilike("title", "%About%")
 
-    if (pageError) console.error("Page Error:", pageError)
-    else console.log("Pages found matching 'About':", pages)
+if (pageError) console.error("Page Error:", pageError)
+else console.log("Pages found matching 'About':", pages)
 
-    console.log("\nChecking RPC search_content...")
-    const { data: searchResults, error: rpcError } = await supabase.rpc('search_content', { keyword: 'About' })
+console.log("\nChecking RPC search_content...")
+const { data: searchResults, error: rpcError } = await supabase.rpc('search_content', { keyword: 'About' })
 
-    if (rpcError) console.error("RPC Error:", rpcError)
-    else console.log("RPC Results:", searchResults)
-}
-
-check()
+if (rpcError) console.error("RPC Error:", rpcError)
+else console.log("RPC Results:", searchResults)

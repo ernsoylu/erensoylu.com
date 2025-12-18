@@ -88,27 +88,28 @@ export const PostManager = () => {
         fetchCategories()
     }, [])
 
+    const buildSlug = (title?: string, slug?: string) =>
+        slug || title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, '') || ""
+
     // URL-driven state management
     useEffect(() => {
         const editId = searchParams.get('edit')
-        const isNew = searchParams.get('new')
+        const isCreatingNew = searchParams.has('new')
 
-        if (editId) {
-            if (currentPostId !== editId && posts.length > 0) {
-                const postToEdit = posts.find(p => p.id === editId)
-                if (postToEdit) {
-                    loadPostIntoForm(postToEdit)
-                }
-            }
-        } else if (isNew) {
-            if (currentPostId !== null || view !== 'edit') {
-                resetFormForNew()
-            }
-        } else {
-            if (view !== 'list') {
-                setView("list")
-                setCurrentPostId(null)
-            }
+        if (editId && posts.length > 0 && currentPostId !== editId) {
+            const postToEdit = posts.find(p => p.id === editId)
+            if (postToEdit) loadPostIntoForm(postToEdit)
+            return
+        }
+
+        if (isCreatingNew && (currentPostId !== null || view !== 'edit')) {
+            resetFormForNew()
+            return
+        }
+
+        if (!editId && !isCreatingNew && view !== 'list') {
+            setView("list")
+            setCurrentPostId(null)
         }
     }, [posts, searchParams, currentPostId, view])
 
@@ -134,7 +135,6 @@ export const PostManager = () => {
             published: false,
             category_id: "none"
         })
-        setIsDirty(false)
         setIsDirty(false)
         setView("edit")
     }
@@ -171,9 +171,10 @@ export const PostManager = () => {
 
     const handleSaveDraft = async () => {
         try {
+            const slug = buildSlug(formData.title, formData.slug)
             const dataToSave = {
                 title: formData.title,
-                slug: formData.slug || formData.title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, ''),
+                slug,
                 content: formData.content,
                 excerpt: formData.excerpt,
                 image_url: formData.image_url,
@@ -186,34 +187,39 @@ export const PostManager = () => {
             // If Post is Published: Save to draft_content, has_draft=true.
             // If Post is Draft (published=false): Save to main columns.
 
-            if (!currentPostId) {
+            if (currentPostId === null) {
                 // New Post
                 const { data, error } = await supabase.from("posts").insert([{ ...dataToSave, published: false }]).select()
                 if (error) throw error
-                setCurrentPostId(data[0].id)
+                const newId = data[0].id
+                setCurrentPostId(newId)
                 await fetchPosts()
-                setSearchParams({ edit: data[0].id })
+                setSearchParams({ edit: newId })
                 toast.success("Draft saved")
+                setIsDirty(false)
+                return
+            }
+
+            const post = posts.find(p => p.id === currentPostId)
+            const isPublished = post?.published === true
+
+            if (isPublished) {
+                // Save as Revision
+                const { error } = await supabase.from("posts").update({
+                    draft_content: { ...dataToSave, published: true }, // Keep published true in draft data context
+                    has_draft: true,
+                    draft_updated_at: new Date().toISOString()
+                }).eq("id", currentPostId)
+                if (error) throw error
+                toast.success("Draft revision saved")
             } else {
-                const post = posts.find(p => p.id === currentPostId)
-                if (post?.published) {
-                    // Save as Revision
-                    const { error } = await supabase.from("posts").update({
-                        draft_content: { ...dataToSave, published: true }, // Keep published true in draft data context
-                        has_draft: true,
-                        draft_updated_at: new Date().toISOString()
-                    }).eq("id", currentPostId)
-                    if (error) throw error
-                    toast.success("Draft revision saved")
-                } else {
-                    // Just update the draft post
-                    const { error } = await supabase.from("posts").update({ ...dataToSave, published: false }).eq("id", currentPostId)
-                    if (error) throw error
-                    toast.success("Draft saved")
-                }
+                // Just update the draft post
+                const { error } = await supabase.from("posts").update({ ...dataToSave, published: false }).eq("id", currentPostId)
+                if (error) throw error
+                toast.success("Draft saved")
             }
             setIsDirty(false)
-            if (currentPostId) fetchPosts()
+            void fetchPosts()
         } catch (error: unknown) {
             console.error("Error saving draft:", error)
             const message = error instanceof Error ? error.message : "Unknown error"
@@ -223,9 +229,10 @@ export const PostManager = () => {
 
     const handlePublish = async () => {
         try {
+            const slug = buildSlug(formData.title, formData.slug)
             const dataToSave = {
                 title: formData.title,
-                slug: formData.slug || formData.title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, ''),
+                slug,
                 content: formData.content,
                 excerpt: formData.excerpt,
                 image_url: formData.image_url,
@@ -236,30 +243,26 @@ export const PostManager = () => {
                 draft_content: null // Clear draft on publish
             }
 
-            if (currentPostId) {
-                const { error } = await supabase.from("posts").update(dataToSave).eq("id", currentPostId)
-                if (error) throw error
-                toast.success("Post published", {
-                    action: {
-                        label: "View",
-                        onClick: () => window.open(`/post/${dataToSave.slug}`, '_blank')
-                    }
-                })
-            } else {
+            if (currentPostId === null) {
                 const { data, error } = await supabase.from("posts").insert([dataToSave]).select()
                 if (error) throw error
-                setCurrentPostId(data[0].id)
+                const newId = data[0].id
+                setCurrentPostId(newId)
                 await fetchPosts()
-                setSearchParams({ edit: data[0].id })
-                toast.success("Post published", {
-                    action: {
-                        label: "View",
-                        onClick: () => window.open(`/post/${dataToSave.slug}`, '_blank')
-                    }
-                })
+                setSearchParams({ edit: newId })
+            } else {
+                const { error } = await supabase.from("posts").update(dataToSave).eq("id", currentPostId)
+                if (error) throw error
             }
+
+            toast.success("Post published", {
+                action: {
+                    label: "View",
+                    onClick: () => window.open(`/post/${dataToSave.slug}`, '_blank')
+                }
+            })
             setIsDirty(false)
-            if (currentPostId) fetchPosts()
+            void fetchPosts()
         } catch (error: unknown) {
             console.error("Error publishing:", error)
             const message = error instanceof Error ? error.message : "Unknown error"

@@ -86,6 +86,9 @@ export const PageManager = () => {
         fetchPages()
     }, [])
 
+    const buildSlug = (title?: string, slug?: string) =>
+        slug || title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, '') || ""
+
     const resetFormForNew = () => {
         setCurrentPageId(null)
         setFormData({
@@ -124,65 +127,71 @@ export const PageManager = () => {
         }
 
         const editId = searchParams.get('edit')
-        const isNew = searchParams.get('new')
+        const isCreatingNew = searchParams.has('new')
 
-        if (editId) {
-            if (currentPageId !== editId && pages.length > 0) {
-                const page = pages.find(p => p.id === editId)
-                if (page) loadPageIntoForm(page)
-            }
-        } else if (isNew) {
-            if (currentPageId !== null || view !== 'edit') {
-                resetFormForNew()
-            }
-        } else {
-            if (view !== 'list') {
-                setView("list")
-                setCurrentPageId(null)
-            }
+        if (editId && pages.length > 0 && currentPageId !== editId) {
+            const page = pages.find(p => p.id === editId)
+            if (page) loadPageIntoForm(page)
+            return
+        }
+
+        if (isCreatingNew && (currentPageId !== null || view !== 'edit')) {
+            resetFormForNew()
+            return
+        }
+
+        if (!editId && !isCreatingNew && view !== 'list') {
+            setView("list")
+            setCurrentPageId(null)
         }
     }, [pages, searchParams, currentPageId, view, setSearchParams])
 
     const handleSaveDraft = async () => {
         logger.action("PageManager", "Save Draft Start", { id: currentPageId })
         try {
+            const slug = buildSlug(formData.title, formData.slug)
             const dataToSave = {
                 title: formData.title,
-                slug: formData.slug || formData.title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, ''),
+                slug,
                 content: formData.content,
                 excerpt: formData.excerpt,
                 image_url: formData.image_url,
                 updated_at: new Date().toISOString()
             }
 
-            if (!currentPageId) {
+            if (currentPageId === null) {
                 const { data, error } = await supabase.from("pages").insert([{ ...dataToSave, published: false }]).select()
                 if (error) throw error
-                setCurrentPageId(data[0].id)
+                const newId = data[0].id
+                setCurrentPageId(newId)
                 await fetchPages()
-                setSearchParams({ edit: data[0].id })
+                setSearchParams({ edit: newId })
                 toast.success("Draft page saved")
-                logger.api("PageManager", "Save Draft (New) Success", { id: data[0].id })
+                logger.api("PageManager", "Save Draft (New) Success", { id: newId })
+                setIsDirty(false)
+                return
+            }
+
+            const page = pages.find(p => p.id === currentPageId)
+            const isPublished = page?.published === true
+
+            if (isPublished) {
+                const { error } = await supabase.from("pages").update({
+                    draft_content: { ...dataToSave, published: true },
+                    has_draft: true,
+                    draft_updated_at: new Date().toISOString()
+                }).eq("id", currentPageId)
+                if (error) throw error
+                toast.success("Draft revision saved")
+                logger.api("PageManager", "Save Draft Revision Success", { id: currentPageId })
             } else {
-                const page = pages.find(p => p.id === currentPageId)
-                if (page?.published) {
-                    const { error } = await supabase.from("pages").update({
-                        draft_content: { ...dataToSave, published: true },
-                        has_draft: true,
-                        draft_updated_at: new Date().toISOString()
-                    }).eq("id", currentPageId)
-                    if (error) throw error
-                    toast.success("Draft revision saved")
-                    logger.api("PageManager", "Save Draft Revision Success", { id: currentPageId })
-                } else {
-                    const { error } = await supabase.from("pages").update({ ...dataToSave, published: false }).eq("id", currentPageId)
-                    if (error) throw error
-                    toast.success("Draft saved")
-                    logger.api("PageManager", "Save Draft (Update) Success", { id: currentPageId })
-                }
+                const { error } = await supabase.from("pages").update({ ...dataToSave, published: false }).eq("id", currentPageId)
+                if (error) throw error
+                toast.success("Draft saved")
+                logger.api("PageManager", "Save Draft (Update) Success", { id: currentPageId })
             }
             setIsDirty(false)
-            if (currentPageId) fetchPages()
+            void fetchPages()
         } catch (error: unknown) {
             logger.error("PageManager", "Save Draft Failed", error)
             const message = error instanceof Error ? error.message : "Unknown error"
@@ -193,9 +202,10 @@ export const PageManager = () => {
 
     const handlePublish = async () => {
         try {
+            const slug = buildSlug(formData.title, formData.slug)
             const dataToSave = {
                 title: formData.title,
-                slug: formData.slug || formData.title?.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)+/g, ''),
+                slug,
                 content: formData.content,
                 excerpt: formData.excerpt,
                 image_url: formData.image_url,
@@ -206,11 +216,12 @@ export const PageManager = () => {
                 draft_updated_at: null,
             }
 
-            if (!currentPageId) {
+            if (currentPageId === null) {
                 const { data, error } = await supabase.from("pages").insert([dataToSave]).select()
                 if (error) throw error
-                setCurrentPageId(data[0].id)
-                setSearchParams({ edit: data[0].id })
+                const newId = data[0].id
+                setCurrentPageId(newId)
+                setSearchParams({ edit: newId })
                 toast.success("Page published!")
             } else {
                 const { error } = await supabase.from("pages").update(dataToSave).eq("id", currentPageId)

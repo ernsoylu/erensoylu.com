@@ -46,6 +46,15 @@ export const ResizableImageComponent = (props: NodeViewProps) => {
         }
     }, [resizing, localWidth, updateAttributes])
 
+    const resizeByPixels = useCallback((delta: number) => {
+        const currentWidth = imgRef.current?.offsetWidth
+        if (!currentWidth) return
+        const newWidth = Math.max(48, currentWidth + delta)
+        const widthPx = `${newWidth}px`
+        setLocalWidth(widthPx)
+        updateAttributes({ width: widthPx })
+    }, [updateAttributes])
+
     useEffect(() => {
         if (resizing) {
             globalThis.window.addEventListener('mousemove', onMouseMove)
@@ -151,10 +160,21 @@ export const ResizableImageComponent = (props: NodeViewProps) => {
 
                 {/* Resize Handle */}
                 {(props.editor.isEditable && (selected || resizing)) && (
-                    <div
-                        className="absolute right-0 bottom-0 w-3 h-3 bg-primary rounded-full cursor-ew-resize translate-x-1/2 translate-y-1/2 shadow-sm z-10 hover:scale-125 transition-transform"
+                    <button
+                        type="button"
+                        className="absolute right-0 bottom-0 w-3 h-3 p-0 border-0 bg-primary rounded-full cursor-ew-resize translate-x-1/2 translate-y-1/2 shadow-sm z-10 hover:scale-125 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         onMouseDown={onMouseDown}
+                        onKeyDown={(e) => {
+                            if (e.key === 'ArrowLeft') {
+                                e.preventDefault()
+                                resizeByPixels(-10)
+                            } else if (e.key === 'ArrowRight') {
+                                e.preventDefault()
+                                resizeByPixels(10)
+                            }
+                        }}
                         title="Drag to resize"
+                        aria-label="Resize image"
                         style={align === 'left' || align === 'right' ? { position: 'absolute' } : {}}
                     />
                 )}

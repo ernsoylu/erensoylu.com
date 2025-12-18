@@ -93,6 +93,54 @@ export const PageListView = () => {
         setSearchParams(newParams)
     }
 
+    let pagesGrid: React.ReactNode
+    if (loading) {
+        pagesGrid = (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                    <div key={i} className="h-48 bg-muted rounded-xl animate-pulse" />
+                ))}
+            </div>
+        )
+    } else if (pages.length > 0) {
+        pagesGrid = (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pages.map(page => (
+                    <Link key={page.id} to={`/page/${page.slug}`} className="group">
+                        <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
+                            <CardHeader className="p-6">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                    <Calendar className="w-3 h-3" />
+                                    {new Date(page.created_at).toLocaleDateString()}
+                                </div>
+                                <CardTitle className="text-xl leading-tight group-hover:text-primary transition-colors">
+                                    {page.title}
+                                </CardTitle>
+                                <CardDescription className="line-clamp-3 mt-2">
+                                    {page.excerpt || "Read more..."}
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+                ))}
+            </div>
+        )
+    } else {
+        pagesGrid = (
+            <div className="text-center py-20 bg-muted/30 rounded-2xl border-dashed border-2">
+                <h3 className="text-lg font-medium">No pages found</h3>
+                <p className="text-muted-foreground">Try adjusting your filters</p>
+                <Button
+                    variant="link"
+                    onClick={() => setSearchParams(new URLSearchParams())}
+                    className="mt-2"
+                >
+                    Clear all filters
+                </Button>
+            </div>
+        )
+    }
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col lg:flex-row gap-8">
@@ -129,46 +177,7 @@ export const PageListView = () => {
                     </div>
 
                     {/* Page Grid */}
-                    {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
-                                <div key={i} className="h-48 bg-muted rounded-xl animate-pulse" />
-                            ))}
-                        </div>
-                    ) : pages.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {pages.map(page => (
-                                <Link key={page.id} to={`/page/${page.slug}`} className="group">
-                                    <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
-                                        <CardHeader className="p-6">
-                                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                                <Calendar className="w-3 h-3" />
-                                                {new Date(page.created_at).toLocaleDateString()}
-                                            </div>
-                                            <CardTitle className="text-xl leading-tight group-hover:text-primary transition-colors">
-                                                {page.title}
-                                            </CardTitle>
-                                            <CardDescription className="line-clamp-3 mt-2">
-                                                {page.excerpt || "Read more..."}
-                                            </CardDescription>
-                                        </CardHeader>
-                                    </Card>
-                                </Link>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-20 bg-muted/30 rounded-2xl border-dashed border-2">
-                            <h3 className="text-lg font-medium">No pages found</h3>
-                            <p className="text-muted-foreground">Try adjusting your filters</p>
-                            <Button
-                                variant="link"
-                                onClick={() => setSearchParams(new URLSearchParams())}
-                                className="mt-2"
-                            >
-                                Clear all filters
-                            </Button>
-                        </div>
-                    )}
+                    {pagesGrid}
 
                     {/* Pagination */}
                     {totalCount > PAGE_SIZE && (

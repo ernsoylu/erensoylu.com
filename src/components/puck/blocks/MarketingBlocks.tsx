@@ -5,6 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Input } from "@/components/ui/input";
 import { Mail, Check, Star } from "lucide-react";
 
+const STAR_KEYS = ["1", "2", "3", "4", "5"] as const;
+
 export interface HeroProps {
     title: string;
     subtitle?: string;
@@ -119,7 +121,9 @@ export const Testimonials = ({ title, testimonials }: TestimonialsProps) => (
                 <Card key={t.name} className="bg-card/50">
                     <CardContent className="p-6">
                         <div className="flex mb-4">
-                            {[...new Array(5)].map((_, i) => <Star key={`star-${i}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
+                            {STAR_KEYS.map((starKey) => (
+                                <Star key={`${t.name}-star-${starKey}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            ))}
                         </div>
                         <p className="text-muted-foreground mb-4 italic">"{t.quote}"</p>
                         <div className="flex items-center gap-3">

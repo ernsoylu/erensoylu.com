@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -66,8 +65,7 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
 
         setUploading(true)
         try {
-            for (let i = 0; i < fileList.length; i++) {
-                const file = fileList[i]
+            for (const file of fileList) {
                 const timestamp = Date.now()
                 const fileName = `${timestamp}_${file.name}`
                 const filePath = currentPath ? `${currentPath}/${fileName}` : fileName
@@ -126,6 +124,107 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
 
     const folders = filteredFiles.filter(f => !f.metadata)
     const regularFiles = filteredFiles.filter(f => f.metadata)
+
+    let filePickerContent: React.ReactNode
+    if (loading) {
+        filePickerContent = <div className="flex items-center justify-center h-64">Loading...</div>
+    } else if (filteredFiles.length === 0) {
+        filePickerContent = (
+            <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+                <Upload className="w-12 h-12 mb-4" />
+                <p>No files found. Upload some images!</p>
+            </div>
+        )
+    } else if (viewMode === 'grid') {
+        filePickerContent = (
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                {folders.map((folder) => (
+                    <button
+                        key={folder.id}
+                        type="button"
+                        className="bg-card text-card-foreground rounded-xl border shadow-sm p-4 hover:bg-muted/50 transition-colors"
+                        onClick={() => navigateToFolder(folder.name)}
+                        aria-label={`Open ${folder.name} folder`}
+                    >
+                        <div className="flex flex-col items-center gap-2">
+                            <FolderOpen className="w-12 h-12 text-primary" />
+                            <span className="text-sm truncate w-full text-center">{folder.name}</span>
+                        </div>
+                    </button>
+                ))}
+                {regularFiles.map((file) => {
+                    const url = getPublicUrl(file.name)
+                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/") ||
+                        file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+                    const isSelected = selectedFile === file.name
+
+                    return (
+                        <button
+                            key={file.id}
+                            type="button"
+                            className={`bg-card text-card-foreground rounded-xl border shadow-sm cursor-pointer transition-all overflow-hidden ${isSelected ? 'ring-2 ring-primary' : ''
+                                }`}
+                            onClick={() => setSelectedFile(file.name)}
+                            aria-pressed={isSelected}
+                            aria-label={`Select ${file.name}`}
+                        >
+                            <div className="aspect-square bg-muted flex items-center justify-center relative overflow-hidden">
+                                {isImage ? (
+                                    <img src={url} alt={file.name} className="object-cover w-full h-full" />
+                                ) : (
+                                    <File className="w-12 h-12 text-muted-foreground" />
+                                )}
+                                {isSelected && (
+                                    <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                        <Check className="w-8 h-8 text-primary" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="p-2">
+                                <div className="text-xs truncate" title={file.name}>{file.name}</div>
+                            </div>
+                        </button>
+                    )
+                })}
+            </div>
+        )
+    } else {
+        filePickerContent = (
+            <div className="space-y-1">
+                {folders.map((folder) => (
+                    <button
+                        key={folder.id}
+                        type="button"
+                        className="w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg text-left"
+                        onClick={() => navigateToFolder(folder.name)}
+                        aria-label={`Open ${folder.name} folder`}
+                    >
+                        <FolderOpen className="w-5 h-5 text-primary" />
+                        <span className="flex-1">{folder.name}</span>
+                    </button>
+                ))}
+                {regularFiles.map((file) => {
+                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/")
+                    const isSelected = selectedFile === file.name
+
+                    return (
+                        <button
+                            key={file.id}
+                            type="button"
+                            className={`w-full flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg text-left ${isSelected ? 'bg-primary/10' : ''
+                                }`}
+                            onClick={() => setSelectedFile(file.name)}
+                            aria-pressed={isSelected}
+                        >
+                            {isImage ? <ImageIcon className="w-5 h-5" /> : <File className="w-5 h-5" />}
+                            <span className="flex-1 truncate">{file.name}</span>
+                            {isSelected && <Check className="w-5 h-5 text-primary" />}
+                        </button>
+                    )
+                })}
+            </div>
+        )
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -187,108 +286,7 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
 
                     {/* File Grid */}
                     <div className="flex-1 overflow-y-auto border rounded-lg p-4">
-                        {loading ? (
-                            <div className="flex items-center justify-center h-64">Loading...</div>
-                        ) : filteredFiles.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-                                <Upload className="w-12 h-12 mb-4" />
-                                <p>No files found. Upload some images!</p>
-                            </div>
-                        ) : viewMode === 'grid' ? (
-                            <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
-                                {folders.map((folder) => (
-                                    <Card
-                                        key={folder.id}
-                                        className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => navigateToFolder(folder.name)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' || e.key === ' ') {
-                                                e.preventDefault()
-                                                navigateToFolder(folder.name)
-                                            }
-                                        }}
-                                        aria-label={`Open ${folder.name} folder`}
-                                    >
-                                        <div className="flex flex-col items-center gap-2">
-                                            <FolderOpen className="w-12 h-12 text-primary" />
-                                            <span className="text-sm truncate w-full text-center">{folder.name}</span>
-                                        </div>
-                                    </Card>
-                                ))}
-                                {regularFiles.map((file) => {
-                                    const url = getPublicUrl(file.name)
-                                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/") ||
-                                        file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-                                    const isSelected = selectedFile === file.name
-
-                                    return (
-                                        <Card
-                                            key={file.id}
-                                            className={`cursor-pointer transition-all ${isSelected ? 'ring-2 ring-primary' : ''
-                                                }`}
-                                            onClick={() => setSelectedFile(file.name)}
-                                        >
-                                            <div className="aspect-square bg-muted flex items-center justify-center relative overflow-hidden">
-                                                {isImage ? (
-                                                    <img src={url} alt={file.name} className="object-cover w-full h-full" />
-                                                ) : (
-                                                    <File className="w-12 h-12 text-muted-foreground" />
-                                                )}
-                                                {isSelected && (
-                                                    <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                                                        <Check className="w-8 h-8 text-primary" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="p-2">
-                                                <div className="text-xs truncate" title={file.name}>{file.name}</div>
-                                            </div>
-                                        </Card>
-                                    )
-                                })}
-                            </div>
-                        ) : (
-                            <div className="space-y-1">
-                                {folders.map((folder) => (
-                                    <div
-                                        key={folder.id}
-                                        className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer"
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => navigateToFolder(folder.name)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' || e.key === ' ') {
-                                                e.preventDefault()
-                                                navigateToFolder(folder.name)
-                                            }
-                                        }}
-                                        aria-label={`Open ${folder.name} folder`}
-                                    >
-                                        <FolderOpen className="w-5 h-5 text-primary" />
-                                        <span className="flex-1">{folder.name}</span>
-                                    </div>
-                                ))}
-                                {regularFiles.map((file) => {
-                                    const isImage = (file.metadata as { mimetype?: string })?.mimetype?.startsWith("image/")
-                                    const isSelected = selectedFile === file.name
-
-                                    return (
-                                        <div
-                                            key={file.id}
-                                            className={`flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg cursor-pointer ${isSelected ? 'bg-primary/10' : ''
-                                                }`}
-                                            onClick={() => setSelectedFile(file.name)}
-                                        >
-                                            {isImage ? <ImageIcon className="w-5 h-5" /> : <File className="w-5 h-5" />}
-                                            <span className="flex-1 truncate">{file.name}</span>
-                                            {isSelected && <Check className="w-5 h-5 text-primary" />}
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        )}
+                        {filePickerContent}
                     </div>
 
                     {/* Footer */}
