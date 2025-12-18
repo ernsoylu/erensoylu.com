@@ -1,10 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { GripVertical, Trash2, Plus } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { getSortableStyle } from "@/components/admin/sortableStyle"
 
 export interface CategoryItem {
     id: string
@@ -41,12 +41,7 @@ export const SortableCategoryItem = ({
         isDragging
     } = useSortable({ id: item.id })
 
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        zIndex: isDragging ? 50 : "auto",
-        position: "relative" as const,
-    }
+    const style = getSortableStyle(transform, transition, isDragging)
 
     const isRoot = depth === 0
 

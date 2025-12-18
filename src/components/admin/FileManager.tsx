@@ -8,6 +8,7 @@ import {
     Upload, Trash2, Copy, Check, Grid3x3, List, FolderOpen,
     Image as ImageIcon, File, Search, ArrowLeft, Download, FolderPlus
 } from "lucide-react"
+import { MEDIA_BUCKET_NAME } from "@/components/admin/mediaConstants"
 
 interface FileObject {
     name: string
@@ -34,14 +35,12 @@ export const FileManager = () => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const dragFileCounterRef = useRef(0)
 
-    const BUCKET_NAME = "media"
-
     useEffect(() => {
         const fetchFiles = async () => {
             setLoading(true)
             try {
                 const { data, error } = await supabase.storage
-                    .from(BUCKET_NAME)
+                    .from(MEDIA_BUCKET_NAME)
                     .list(currentPath, {
                         limit: 1000,
                         offset: 0,
@@ -62,7 +61,7 @@ export const FileManager = () => {
     const fetchFiles = async () => {
         // Exposed for other functions to refresh
         const { data } = await supabase.storage
-            .from(BUCKET_NAME)
+            .from(MEDIA_BUCKET_NAME)
             .list(currentPath, {
                 limit: 1000,
                 offset: 0,
@@ -83,7 +82,7 @@ export const FileManager = () => {
                 const filePath = currentPath ? `${currentPath}/${fileName}` : fileName
 
                 const { error } = await supabase.storage
-                    .from(BUCKET_NAME)
+                    .from(MEDIA_BUCKET_NAME)
                     .upload(filePath, file)
 
                 if (error) throw error
@@ -161,7 +160,7 @@ export const FileManager = () => {
         if (!confirm("Are you sure?")) return
         try {
             const fullPath = currentPath ? `${currentPath}/${fileName}` : fileName
-            const { error } = await supabase.storage.from(BUCKET_NAME).remove([fullPath])
+            const { error } = await supabase.storage.from(MEDIA_BUCKET_NAME).remove([fullPath])
             if (error) throw error
             fetchFiles()
             selectedFiles.delete(fileName)
@@ -177,7 +176,7 @@ export const FileManager = () => {
             const paths = Array.from(selectedFiles).map(name =>
                 currentPath ? `${currentPath}/${name}` : name
             )
-            const { error } = await supabase.storage.from(BUCKET_NAME).remove(paths)
+            const { error } = await supabase.storage.from(MEDIA_BUCKET_NAME).remove(paths)
             if (error) throw error
             fetchFiles()
             setSelectedFiles(new Set())
@@ -188,7 +187,7 @@ export const FileManager = () => {
 
     const getPublicUrl = (fileName: string) => {
         const fullPath = currentPath ? `${currentPath}/${fileName}` : fileName
-        const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fullPath)
+        const { data } = supabase.storage.from(MEDIA_BUCKET_NAME).getPublicUrl(fullPath)
         return data.publicUrl
     }
 
@@ -225,7 +224,7 @@ export const FileManager = () => {
             // Create a placeholder file in the new folder (Supabase doesn't support empty folders)
             const folderPath = currentPath ? `${currentPath}/${newFolderName}/.keep` : `${newFolderName}/.keep`
             const { error } = await supabase.storage
-                .from(BUCKET_NAME)
+                .from(MEDIA_BUCKET_NAME)
                 .upload(folderPath, new Blob([''], { type: 'text/plain' }))
 
             if (error) throw error
@@ -245,7 +244,7 @@ export const FileManager = () => {
 
             // Check if source is a folder by trying to list its contents
             const { data: sourceFiles } = await supabase.storage
-                .from(BUCKET_NAME)
+                .from(MEDIA_BUCKET_NAME)
                 .list(sourcePath)
 
             if (sourceFiles && sourceFiles.length > 0) {
@@ -255,23 +254,23 @@ export const FileManager = () => {
                     const newPath = `${targetPath}/${file.name}`
 
                     const { data: fileData } = await supabase.storage
-                        .from(BUCKET_NAME)
+                        .from(MEDIA_BUCKET_NAME)
                         .download(oldPath)
 
                     if (fileData) {
-                        await supabase.storage.from(BUCKET_NAME).upload(newPath, fileData)
-                        await supabase.storage.from(BUCKET_NAME).remove([oldPath])
+                        await supabase.storage.from(MEDIA_BUCKET_NAME).upload(newPath, fileData)
+                        await supabase.storage.from(MEDIA_BUCKET_NAME).remove([oldPath])
                     }
                 }
             } else {
                 // It's a file, move it
                 const { data: fileData } = await supabase.storage
-                    .from(BUCKET_NAME)
+                    .from(MEDIA_BUCKET_NAME)
                     .download(sourcePath)
 
                 if (fileData) {
-                    await supabase.storage.from(BUCKET_NAME).upload(targetPath, fileData)
-                    await supabase.storage.from(BUCKET_NAME).remove([sourcePath])
+                    await supabase.storage.from(MEDIA_BUCKET_NAME).upload(targetPath, fileData)
+                    await supabase.storage.from(MEDIA_BUCKET_NAME).remove([sourcePath])
                 }
             }
 

@@ -8,6 +8,7 @@ import {
     Upload, Grid3x3, List, FolderOpen, Image as ImageIcon,
     File, Search, ArrowLeft, Check
 } from "lucide-react"
+import { MEDIA_BUCKET_NAME } from "@/components/admin/mediaConstants"
 
 interface FileObject {
     name: string
@@ -30,13 +31,11 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedFile, setSelectedFile] = useState<string | null>(null)
 
-    const BUCKET_NAME = "media"
-
     const fetchFiles = useCallback(async () => {
         setLoading(true)
         try {
             const { data, error } = await supabase.storage
-                .from(BUCKET_NAME)
+                .from(MEDIA_BUCKET_NAME)
                 .list(currentPath, {
                     limit: 1000,
                     offset: 0,
@@ -71,7 +70,7 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
                 const filePath = currentPath ? `${currentPath}/${fileName}` : fileName
 
                 const { error } = await supabase.storage
-                    .from(BUCKET_NAME)
+                    .from(MEDIA_BUCKET_NAME)
                     .upload(filePath, file)
 
                 if (error) throw error
@@ -94,7 +93,7 @@ export const FileManagerModal = ({ open, onOpenChange, onSelect }: FileManagerMo
 
     const getPublicUrl = (fileName: string) => {
         const fullPath = currentPath ? `${currentPath}/${fileName}` : fileName
-        const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(fullPath)
+        const { data } = supabase.storage.from(MEDIA_BUCKET_NAME).getPublicUrl(fullPath)
         return data.publicUrl
     }
 
