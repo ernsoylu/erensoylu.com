@@ -142,10 +142,10 @@ export const CategoryManager = () => {
             setCategories(updatedCategories) // Cast back assuming sort_order exists
 
             // Persist to DB
-            for (let i = 0; i < newOrder.length; i++) {
+            for (const [index, item] of newOrder.entries()) {
                 await supabase.from("categories")
-                    .update({ sort_order: i })
-                    .eq("id", newOrder[i].id)
+                    .update({ sort_order: index })
+                    .eq("id", item.id)
             }
         }
     }

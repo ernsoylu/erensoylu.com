@@ -139,8 +139,8 @@ export const MenuManager = () => {
             setItems(updatedItems)
 
             // Persist order to DB
-            for (let i = 0; i < newOrder.length; i++) {
-                await supabase.from("navbar_items").update({ sort_order: i }).eq("id", newOrder[i].id)
+            for (const [index, item] of newOrder.entries()) {
+                await supabase.from("navbar_items").update({ sort_order: index }).eq("id", item.id)
             }
         }
     }
