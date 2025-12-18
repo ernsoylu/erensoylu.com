@@ -76,11 +76,11 @@ export const AdminLayout = () => {
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session) {
+            if (session) {
+                logger.action("AdminLayout", "Auth Check Passed", { user: session.user.email })
+            } else {
                 logger.action("AdminLayout", "Auth Check Failed", { redirect: "/login" })
                 navigate("/login")
-            } else {
-                logger.action("AdminLayout", "Auth Check Passed", { user: session.user.email })
             }
             setLoading(false)
         })
