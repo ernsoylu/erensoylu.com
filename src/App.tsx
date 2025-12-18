@@ -1,10 +1,10 @@
 import { Route, Routes } from 'react-router-dom'
 import { Home } from './pages/Home'
-
 import { Login } from './pages/Login'
 import { PostView } from './pages/PostView'
 import { PageView } from './pages/PageView'
 import { PostListView } from './pages/PostListView'
+import { PageListView } from './pages/PageListView'
 
 import { PublicLayout } from './components/PublicLayout'
 import { AdminLayout } from './components/AdminLayout'
@@ -26,6 +26,7 @@ function App() {
         <Route path="/post/:slug" element={<PostView />} />
         <Route path="/page/:slug" element={<PageView />} />
         <Route path="/posts" element={<PostListView />} />
+        <Route path="/pages" element={<PageListView />} />
       </Route>
 
       {/* Admin Routes */}
