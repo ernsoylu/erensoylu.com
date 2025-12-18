@@ -54,10 +54,10 @@ export const ImageCarousel = ({ images }: ImageCarouselProps) => (
     <section className="container mx-auto px-4 py-8">
         <Carousel className="w-full max-w-4xl mx-auto">
             <CarouselContent>
-                {images.map((img, idx) => (
-                    <CarouselItem key={idx}>
+                {images.map((img) => (
+                    <CarouselItem key={img.url}>
                         <div className="aspect-video rounded-xl overflow-hidden bg-muted">
-                            <img src={img.url} alt={img.caption || `Image ${idx + 1}`} className="w-full h-full object-cover" />
+                            <img src={img.url} alt={img.caption || `Carousel image`} className="w-full h-full object-cover" />
                         </div>
                         {img.caption && <p className="text-center text-sm text-muted-foreground mt-2">{img.caption}</p>}
                     </CarouselItem>
@@ -96,8 +96,8 @@ export const FAQSection = ({ title, faqs }: FAQSectionProps) => (
     <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">{title}</h2>
         <Accordion type="single" collapsible className="max-w-3xl mx-auto">
-            {faqs.map((faq, idx) => (
-                <AccordionItem key={idx} value={`item-${idx}`}>
+            {faqs.map((faq) => (
+                <AccordionItem key={faq.question} value={faq.question}>
                     <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
                     <AccordionContent className="text-muted-foreground">{faq.answer}</AccordionContent>
                 </AccordionItem>

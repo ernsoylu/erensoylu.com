@@ -96,8 +96,8 @@ export interface StatsCounterProps {
 export const StatsCounter = ({ stats }: StatsCounterProps) => (
     <section className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, idx) => (
-                <div key={idx} className="text-center">
+            {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
                     <div className="text-4xl md:text-5xl font-extrabold text-primary mb-2">{stat.value}</div>
                     <div className="text-sm md:text-base text-muted-foreground font-medium">{stat.label}</div>
                 </div>
@@ -115,11 +115,11 @@ export const Testimonials = ({ title, testimonials }: TestimonialsProps) => (
     <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">{title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, idx) => (
-                <Card key={idx} className="bg-card/50">
+            {testimonials.map((t) => (
+                <Card key={t.name} className="bg-card/50">
                     <CardContent className="p-6">
                         <div className="flex mb-4">
-                            {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
+                            {[...Array(5)].map((_, i) => <Star key={`star-${i}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
                         </div>
                         <p className="text-muted-foreground mb-4 italic">"{t.quote}"</p>
                         <div className="flex items-center gap-3">
@@ -165,8 +165,8 @@ export const LogoCloud = ({ title, logos }: LogoCloudProps) => (
     <section className="container mx-auto px-4 py-16">
         <h3 className="text-center text-sm font-semibold text-muted-foreground mb-8 uppercase tracking-wider">{title}</h3>
         <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-60 grayscale hover:grayscale-0 transition-all">
-            {logos.map((logo, idx) => (
-                <img key={idx} src={logo.url} alt={logo.name} className="h-8 md:h-10 object-contain" />
+            {logos.map((logo) => (
+                <img key={logo.name} src={logo.url} alt={logo.name} className="h-8 md:h-10 object-contain" />
             ))}
         </div>
     </section>
@@ -181,8 +181,8 @@ export const TeamSection = ({ title, members }: TeamSectionProps) => (
     <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">{title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {members.map((member, idx) => (
-                <Card key={idx} className="text-center">
+            {members.map((member) => (
+                <Card key={member.name} className="text-center">
                     <CardContent className="p-6">
                         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/50 mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold">
                             {member.name[0]}
@@ -212,10 +212,10 @@ export const PricingTable = ({ title, plans }: PricingTableProps) => (
     <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">{title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {plans.map((plan, idx) => {
+            {plans.map((plan) => {
                 const features = typeof plan.features === 'string' ? plan.features.split(',').map((f: string) => f.trim()) : plan.features;
                 return (
-                    <Card key={idx} className={plan.featured ? "border-primary shadow-lg scale-105" : ""}>
+                    <Card key={plan.name} className={plan.featured ? "border-primary shadow-lg scale-105" : ""}>
                         <CardHeader>
                             <CardTitle>{plan.name}</CardTitle>
                             <CardDescription>{plan.description}</CardDescription>
@@ -223,8 +223,8 @@ export const PricingTable = ({ title, plans }: PricingTableProps) => (
                         </CardHeader>
                         <CardContent>
                             <ul className="space-y-2 mb-6">
-                                {features.map((feature: string, i: number) => (
-                                    <li key={i} className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" />{feature}</li>
+                                {features.map((feature: string) => (
+                                    <li key={feature} className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" />{feature}</li>
                                 ))}
                             </ul>
                             <Button className="w-full" variant={plan.featured ? "default" : "outline"}>Get Started</Button>
