@@ -21,6 +21,7 @@ import {
 } from "@dnd-kit/sortable"
 import { SortableMenuItem, type MenuItem } from "./menu/SortableMenuItem"
 import { LinkSelectorModal } from "./LinkSelectorModal"
+import { omitChildrenField, persistSortOrder } from "@/lib/supabaseHelpers"
 
 // Removed local MenuItem interface to use the one from SortableMenuItem
 
@@ -100,14 +101,7 @@ export const MenuManager = () => {
 
         try {
             // Debounce or just fire? For now direct fire.
-            // Exclude children from update
-            // Exclude children from update
-            const dbUpdates = { ...updates }
-            if ('children' in dbUpdates) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                delete (dbUpdates as any).children
-            }
-            const { error } = await supabase.from("navbar_items").update(dbUpdates).eq("id", id)
+            const { error } = await supabase.from("navbar_items").update(omitChildrenField(updates)).eq("id", id)
             if (error) throw error
         } catch (error) {
             console.error("Error updating item:", error)
@@ -140,10 +134,7 @@ export const MenuManager = () => {
             })
             setItems(updatedItems)
 
-            // Persist order to DB
-            for (const [index, item] of newOrder.entries()) {
-                await supabase.from("navbar_items").update({ sort_order: index }).eq("id", item.id)
-            }
+            await persistSortOrder("navbar_items", newOrder)
         }
     }
 

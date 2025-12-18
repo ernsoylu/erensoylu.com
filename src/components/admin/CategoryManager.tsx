@@ -21,6 +21,7 @@ import {
 } from "@dnd-kit/sortable"
 // Import SortableCategoryItem and its interface
 import { SortableCategoryItem, type CategoryItem } from "./category/SortableCategoryItem"
+import { omitChildrenField, persistSortOrder } from "@/lib/supabaseHelpers"
 
 export const CategoryManager = () => {
     // Transform DB category to CategoryItem (ensure sort_order exists in state)
@@ -101,12 +102,7 @@ export const CategoryManager = () => {
         setCategories(categories.map(c => c.id === id ? { ...c, ...updates } : c))
 
         try {
-            const dbUpdates = { ...updates }
-            if ('children' in dbUpdates) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                delete (dbUpdates as any).children
-            }
-            const { error } = await supabase.from("categories").update(dbUpdates).eq("id", id)
+            const { error } = await supabase.from("categories").update(omitChildrenField(updates)).eq("id", id)
             if (error) throw error
         } catch (error) {
             console.error("Error updating category:", error)
@@ -141,12 +137,7 @@ export const CategoryManager = () => {
             })
             setCategories(updatedCategories) // Cast back assuming sort_order exists
 
-            // Persist to DB
-            for (const [index, item] of newOrder.entries()) {
-                await supabase.from("categories")
-                    .update({ sort_order: index })
-                    .eq("id", item.id)
-            }
+            await persistSortOrder("categories", newOrder)
         }
     }
 
