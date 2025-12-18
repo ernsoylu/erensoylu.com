@@ -2,7 +2,9 @@ import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, ArrowLeft } from "lucide-react"
+import { Calendar, ArrowLeft, Edit } from "lucide-react"
+import { TiptapRenderer } from "@/components/ui/TiptapRenderer"
+import { Button } from "@/components/ui/button"
 
 interface Post {
     id: string
@@ -20,6 +22,13 @@ export const PostView = () => {
 
     const [toc, setToc] = useState<{ id: string, text: string, level: number }[]>([])
     const [processedContent, setProcessedContent] = useState("")
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setIsAdmin(!!session)
+        })
+    }, [])
 
     useEffect(() => {
         if (slug) fetchPost()
@@ -61,17 +70,27 @@ export const PostView = () => {
           content, 
           image_url, 
           created_at,
+          published,
           category:categories(name)
         `)
                 .eq("slug", slug)
-                .eq("published", true)
                 .single()
 
             if (error) throw error
+
+            // If not published, check if admin
+            if (!data.published) {
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    throw new Error("Post not found or not published")
+                }
+            }
+
             // @ts-ignore
             setPost(data)
         } catch (error) {
             console.error("Error fetching post:", error)
+            setPost(null)
         } finally {
             setLoading(false)
         }
@@ -123,6 +142,18 @@ export const PostView = () => {
                             )}
                         </div>
 
+                        {/* Admin Edit Shortcut */}
+                        {isAdmin && (
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Admin</h4>
+                                <Link to={`/admin/posts?edit=${post.id}`}>
+                                    <Button variant="outline" size="icon" title="Edit Post">
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
+
                         {/* TOC Section */}
                         {toc.length > 0 && (
                             <div className="space-y-3">
@@ -133,8 +164,8 @@ export const PostView = () => {
                                             key={item.id}
                                             href={`#${item.id}`}
                                             className={`text-sm hover:text-primary transition-colors block py-0.5 border-l-2 -ml-[13px] pl-3 ${item.level === 1 ? 'border-transparent font-medium text-foreground' :
-                                                    item.level === 2 ? 'border-transparent pl-5 text-muted-foreground' :
-                                                        'border-transparent pl-7 text-muted-foreground/80'
+                                                item.level === 2 ? 'border-transparent pl-5 text-muted-foreground' :
+                                                    'border-transparent pl-7 text-muted-foreground/80'
                                                 }`}
                                             onClick={(e) => {
                                                 e.preventDefault()
@@ -158,10 +189,7 @@ export const PostView = () => {
                         </div>
                     )}
 
-                    <div
-                        className="prose prose-lg prose-sm dark:prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ __html: processedContent || post.content }}
-                    />
+                    <TiptapRenderer content={processedContent || post.content} />
                 </article>
             </div>
         </div>

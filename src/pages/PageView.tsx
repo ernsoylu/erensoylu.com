@@ -2,7 +2,9 @@ import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, ArrowLeft } from "lucide-react"
+import { Calendar, ArrowLeft, Edit } from "lucide-react"
+import { TiptapRenderer } from "@/components/ui/TiptapRenderer"
+import { Button } from "@/components/ui/button"
 
 interface Page {
     id: string
@@ -20,6 +22,13 @@ export const PageView = () => {
 
     const [toc, setToc] = useState<{ id: string, text: string, level: number }[]>([])
     const [processedContent, setProcessedContent] = useState("")
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setIsAdmin(!!session)
+        })
+    }, [])
 
     useEffect(() => {
         if (slug) fetchPage()
@@ -121,6 +130,18 @@ export const PageView = () => {
                             )}
                         </div>
 
+                        {/* Admin Edit Shortcut */}
+                        {isAdmin && (
+                            <div>
+                                <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">Admin</h4>
+                                <Link to={`/admin/pages?edit=${page.id}`}>
+                                    <Button variant="outline" size="icon" title="Edit Page">
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
+
                         {/* TOC Section */}
                         {toc.length > 0 && (
                             <div className="space-y-3">
@@ -150,10 +171,7 @@ export const PageView = () => {
 
                 {/* Main Content */}
                 <article className="flex-1 max-w-3xl min-w-0">
-                    <div
-                        className="prose prose-lg prose-sm dark:prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ __html: processedContent || page.content }}
-                    />
+                    <TiptapRenderer content={processedContent || page.content} />
                 </article>
             </div>
         </div>

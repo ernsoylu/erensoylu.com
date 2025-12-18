@@ -1,4 +1,4 @@
-import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react'
+import { useEditor, EditorContent, ReactNodeViewRenderer, mergeAttributes } from '@tiptap/react'
 import 'highlight.js/styles/github-dark.css' // Syntax highlighting theme
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
@@ -25,6 +25,7 @@ import sql from 'highlight.js/lib/languages/sql'
 import java from 'highlight.js/lib/languages/java'
 import kotlin from 'highlight.js/lib/languages/kotlin'
 import { CodeBlockComponent } from './CodeBlockComponent'
+import { ResizableImageComponent } from './ResizableImageComponent'
 
 import { Button } from "@/components/ui/button"
 import {
@@ -92,7 +93,42 @@ export const TiptapEditor = ({ content, onChange, placeholder = "Start typing...
                     return ReactNodeViewRenderer(CodeBlockComponent)
                 },
             }),
-            Image,
+
+            Image.extend({
+                addAttributes() {
+                    return {
+                        src: {
+                            default: null,
+                        },
+                        alt: {
+                            default: null,
+                        },
+                        title: {
+                            default: null,
+                        },
+                        width: {
+                            default: '100%',
+                            renderHTML: attributes => {
+                                return {
+                                    width: attributes.width,
+                                    style: `width: ${attributes.width}`
+                                }
+                            },
+                        },
+                        align: {
+                            default: 'center',
+                            renderHTML: attributes => {
+                                return {
+                                    'data-align': attributes.align,
+                                }
+                            },
+                        },
+                    }
+                },
+                addNodeView() {
+                    return ReactNodeViewRenderer(ResizableImageComponent)
+                },
+            }),
             Link.configure({
                 openOnClick: false,
                 HTMLAttributes: {
@@ -232,10 +268,10 @@ export const TiptapEditor = ({ content, onChange, placeholder = "Start typing...
                         label="Highlight"
                     />
                     <ToolbarButton
-                        onClick={() => editor.chain().focus().toggleCode().run()}
-                        isActive={editor.isActive('code')}
+                        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                        isActive={editor.isActive('codeBlock')}
                         icon={Code}
-                        label="Code"
+                        label="Code Block"
                     />
                 </div>
 

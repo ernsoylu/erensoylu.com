@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,9 +12,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Trash2, Edit, Plus, ArrowLeft, Eye } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Trash2, Edit, Plus, ArrowLeft, Eye, ExternalLink, ShieldAlert } from "lucide-react"
+import { toast } from "sonner"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TiptapEditor } from "@/components/ui/tiptap-editor"
+import { FileManagerModal } from "./FileManagerModal"
+import { UnsavedChangesDialog } from "./UnsavedChangesDialog"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface Page {
     id: string
@@ -21,24 +26,75 @@ interface Page {
     slug: string
     content: string
     created_at: string
+    excerpt: string | null
+    image_url: string | null
+    published: boolean
+    draft_content?: any
+    has_draft?: boolean
+    draft_updated_at?: string
 }
 
 export const PageManager = () => {
     const [view, setView] = useState<"list" | "edit">("list")
     const [pages, setPages] = useState<Page[]>([])
     const [loading, setLoading] = useState(true)
+    const [searchParams, setSearchParams] = useSearchParams()
 
     // Edit State
     const [currentPageId, setCurrentPageId] = useState<string | null>(null)
     const [formData, setFormData] = useState<Partial<Page>>({
         title: "",
         slug: "",
-        content: ""
+        content: "",
+        excerpt: "",
+        image_url: "",
+        published: false
     })
+
+    // Draft & Dirty State
+    const [isDirty, setIsDirty] = useState(false)
+    const [hasRemoteDraft, setHasRemoteDraft] = useState(false)
+    const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
+    const [pendingNavigation, setPendingNavigation] = useState<(() => void) | null>(null)
+
+    const [imageModalOpen, setImageModalOpen] = useState(false)
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault()
+                e.returnValue = ""
+            }
+        }
+        window.addEventListener("beforeunload", handleBeforeUnload)
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+    }, [isDirty])
 
     useEffect(() => {
         fetchPages()
     }, [])
+
+    // URL-driven state management
+    useEffect(() => {
+        const editId = searchParams.get('edit')
+        const isNew = searchParams.get('new')
+
+        if (editId) {
+            if (currentPageId !== editId && pages.length > 0) {
+                const page = pages.find(p => p.id === editId)
+                if (page) loadPageIntoForm(page)
+            }
+        } else if (isNew) {
+            if (currentPageId !== null || view !== 'edit') {
+                resetFormForNew()
+            }
+        } else {
+            if (view !== 'list') {
+                setView("list")
+                setCurrentPageId(null)
+            }
+        }
+    }, [pages, searchParams, currentPageId, view])
 
     const fetchPages = async () => {
         try {
@@ -52,53 +108,117 @@ export const PageManager = () => {
         }
     }
 
-    const handleCreateNew = () => {
+    const resetFormForNew = () => {
         setCurrentPageId(null)
         setFormData({
             title: "",
             slug: "",
-            content: ""
+            content: "",
+            excerpt: "",
+            image_url: "",
+            published: false
         })
+        setIsDirty(false)
+        setHasRemoteDraft(false)
         setView("edit")
     }
 
-    const handleEdit = (page: Page) => {
+    const loadPageIntoForm = (page: Page) => {
         setCurrentPageId(page.id)
-        setFormData({
-            ...page
-        })
+
+        if (page.has_draft && page.draft_content) {
+            setFormData({ ...page.draft_content })
+            toast("Draft content loaded", {
+                description: `Restored unsaved changes from ${new Date(page.draft_updated_at!).toLocaleString()}`,
+                action: {
+                    label: "Dismiss",
+                    onClick: () => { }
+                }
+            })
+        } else {
+            setFormData({ ...page })
+        }
+
+        setIsDirty(false)
         setView("edit")
+        setSearchParams({ edit: page.id })
     }
 
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault()
-
-        // Auto-generate slug if empty
-        let slug = formData.slug
-        if (!slug && formData.title) {
-            slug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
-        }
-
-        const saveData = {
-            title: formData.title,
-            slug: slug,
-            content: formData.content,
-            updated_at: new Date().toISOString()
-        }
-
+    const handleSaveDraft = async () => {
         try {
-            if (currentPageId) {
-                const { error } = await supabase.from("pages").update(saveData).eq("id", currentPageId)
-                if (error) throw error
-            } else {
-                const { error } = await supabase.from("pages").insert([saveData])
-                if (error) throw error
+            const dataToSave = {
+                title: formData.title,
+                slug: formData.slug || formData.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+                content: formData.content,
+                excerpt: formData.excerpt,
+                image_url: formData.image_url,
+                updated_at: new Date().toISOString()
             }
-            fetchPages()
-            setView("list")
+
+            if (!currentPageId) {
+                const { data, error } = await supabase.from("pages").insert([{ ...dataToSave, published: false }]).select()
+                if (error) throw error
+                setCurrentPageId(data[0].id)
+                await fetchPages()
+                setSearchParams({ edit: data[0].id })
+                toast.success("Draft page saved")
+            } else {
+                const page = pages.find(p => p.id === currentPageId)
+                if (page?.published) {
+                    const { error } = await supabase.from("pages").update({
+                        draft_content: { ...dataToSave, published: true },
+                        has_draft: true,
+                        draft_updated_at: new Date().toISOString()
+                    }).eq("id", currentPageId)
+                    if (error) throw error
+                    toast.success("Draft revision saved")
+                    setHasRemoteDraft(true)
+                } else {
+                    const { error } = await supabase.from("pages").update({ ...dataToSave, published: false }).eq("id", currentPageId)
+                    if (error) throw error
+                    toast.success("Draft saved")
+                }
+            }
+            setIsDirty(false)
+            if (currentPageId) fetchPages()
         } catch (error: any) {
-            console.error("Error saving page:", error)
-            alert(`Error saving page: ${error.message || JSON.stringify(error)}`)
+            console.error("Error saving draft:", error)
+            toast.error(`Error saving draft: ${error.message}`)
+        }
+    }
+
+    const handlePublish = async () => {
+        try {
+            const dataToSave = {
+                title: formData.title,
+                slug: formData.slug || formData.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+                content: formData.content,
+                excerpt: formData.excerpt,
+                image_url: formData.image_url,
+                published: true,
+                updated_at: new Date().toISOString(),
+                draft_content: null,
+                has_draft: false,
+                draft_updated_at: null,
+            }
+
+            if (!currentPageId) {
+                const { data, error } = await supabase.from("pages").insert([dataToSave]).select()
+                if (error) throw error
+                setCurrentPageId(data[0].id)
+                setSearchParams({ edit: data[0].id })
+                toast.success("Page published!")
+            } else {
+                const { error } = await supabase.from("pages").update(dataToSave).eq("id", currentPageId)
+                if (error) throw error
+                toast.success("Page updated and published!")
+            }
+            setIsDirty(false)
+            setHasRemoteDraft(false)
+            fetchPages()
+        } catch (error: any) {
+            console.error("Error publishing page:", error)
+            toast.error(`Error publishing page: ${error.message}`)
         }
     }
 
@@ -120,42 +240,145 @@ export const PageManager = () => {
         return (
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" size="icon" onClick={() => setView("list")}>
+                    <Button variant="outline" size="icon" onClick={() => setSearchParams({})}>
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                     <h2 className="text-2xl font-bold">{currentPageId ? "Edit Page" : "New Page"}</h2>
+                    {formData.slug && (
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => window.open(`/page/${formData.slug}`, '_blank')}
+                            title="View Page"
+                        >
+                            <ExternalLink className="h-4 w-4" />
+                        </Button>
+                    )}
                 </div>
 
-                <form onSubmit={handleSave} className="grid grid-cols-1 gap-6">
-                    <Card>
-                        <CardContent className="p-6 space-y-4">
-                            <div className="space-y-2">
-                                <Label>Title</Label>
-                                <Input
-                                    value={formData.title}
-                                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Slug</Label>
-                                <Input
-                                    value={formData.slug}
-                                    onChange={e => setFormData({ ...formData, slug: e.target.value })}
-                                    placeholder="Leave empty to auto-generate from title"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Content</Label>
-                                <TiptapEditor
-                                    content={formData.content || ""}
-                                    onChange={content => setFormData({ ...formData, content })}
-                                />
-                            </div>
-                            <Button type="submit" className="w-full sm:w-auto">Save Page</Button>
-                        </CardContent>
-                    </Card>
-                </form>
+
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                        <Card>
+                            <CardContent className="p-6 space-y-4">
+                                <div className="space-y-2">
+                                    <Label>Title</Label>
+                                    <Input
+                                        value={formData.title}
+                                        onChange={e => {
+                                            setFormData({ ...formData, title: e.target.value })
+                                            setIsDirty(true)
+                                        }}
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Content</Label>
+                                    <TiptapEditor
+                                        content={formData.content || ""}
+                                        onChange={content => {
+                                            setFormData({ ...formData, content })
+                                            setIsDirty(true)
+                                        }}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <div className="space-y-6">
+                        <Card>
+                            <CardHeader><CardTitle>Publishing</CardTitle></CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium">Status</span>
+                                    <span className={`text-xs px-2 py-1 rounded-full ${formData.published ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'}`}>
+                                        {formData.published ? "Published" : "Draft"}
+                                    </span>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Slug</Label>
+                                    <Input
+                                        value={formData.slug}
+                                        onChange={e => {
+                                            setFormData({ ...formData, slug: e.target.value })
+                                            setIsDirty(true)
+                                        }}
+                                    />
+                                </div>
+                                <div className="pt-4 space-y-2">
+                                    <Button onClick={handleSaveDraft} variant="secondary" className="w-full">
+                                        Save Draft
+                                    </Button>
+                                    <Button onClick={handlePublish} className="w-full">
+                                        {formData.published ? "Update & Publish" : "Publish"}
+                                    </Button>
+                                    {isDirty && <p className="text-xs text-center text-muted-foreground">Unsaved changes</p>}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader><CardTitle>Featured Image</CardTitle></CardHeader>
+                            <CardContent className="space-y-4">
+                                {formData.image_url && (
+                                    <img src={formData.image_url} alt="Featured" className="w-full h-40 object-cover rounded-md" />
+                                )}
+                                <div className="flex gap-2">
+                                    <Input
+                                        value={formData.image_url || ""}
+                                        onChange={e => {
+                                            setFormData({ ...formData, image_url: e.target.value })
+                                            setIsDirty(true)
+                                        }}
+                                        placeholder="Image URL"
+                                    />
+                                    <Button type="button" variant="secondary" onClick={() => setImageModalOpen(true)}>Select</Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader><CardTitle>Excerpt</CardTitle></CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <Label>Page Excerpt</Label>
+                                        <span className="text-xs text-muted-foreground">{formData.excerpt?.length || 0} chars</span>
+                                    </div>
+                                    <textarea
+                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        value={formData.excerpt || ""}
+                                        onChange={e => {
+                                            setFormData({ ...formData, excerpt: e.target.value })
+                                            setIsDirty(true)
+                                        }}
+                                        placeholder="A short summary of the page..."
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+
+                <UnsavedChangesDialog
+                    open={showUnsavedDialog}
+                    onOpenChange={setShowUnsavedDialog}
+                    onSaveDraft={() => { handleSaveDraft(); setShowUnsavedDialog(false); pendingNavigation?.(); }}
+                    onPublish={() => { handlePublish(); setShowUnsavedDialog(false); pendingNavigation?.(); }}
+                    onDiscard={() => { setIsDirty(false); setShowUnsavedDialog(false); pendingNavigation?.(); }}
+                />
+
+                <FileManagerModal
+                    open={imageModalOpen}
+                    onOpenChange={setImageModalOpen}
+                    onSelect={(url) => {
+                        setFormData({ ...formData, image_url: url })
+                        setIsDirty(true)
+                        setImageModalOpen(false)
+                    }}
+                />
             </div>
         )
     }
@@ -164,7 +387,7 @@ export const PageManager = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-bold tracking-tight">Pages</h2>
-                <Button onClick={handleCreateNew}>
+                <Button onClick={() => setSearchParams({ new: 'true' })}>
                     <Plus className="mr-2 h-4 w-4" /> New Page
                 </Button>
             </div>
@@ -176,7 +399,8 @@ export const PageManager = () => {
                             <TableRow>
                                 <TableHead>Title</TableHead>
                                 <TableHead>Slug</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead>Created At</TableHead>
+                                <TableHead className="w-[100px]">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -184,24 +408,19 @@ export const PageManager = () => {
                                 <TableRow key={page.id}>
                                     <TableCell className="font-medium">{page.title}</TableCell>
                                     <TableCell>{page.slug}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" onClick={() => window.open(`/page/${page.slug}`, '_blank')} title="View Page">
-                                            <Eye className="h-4 w-4" />
-                                        </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleEdit(page)}>
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDelete(page.id)} className="text-destructive">
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                    <TableCell>{new Date(page.created_at).toLocaleDateString()}</TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <Button variant="ghost" size="icon" onClick={() => setSearchParams({ edit: page.id })}>
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" onClick={() => handleDelete(page.id)}>
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {pages.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">No pages found.</TableCell>
-                                </TableRow>
-                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

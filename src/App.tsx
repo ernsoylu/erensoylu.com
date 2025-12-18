@@ -15,31 +15,36 @@ import { FileManager } from './components/admin/FileManager'
 import { PostManager } from './components/admin/PostManager'
 import { PageManager } from './components/admin/PageManager'
 import { FrontPageManager } from './components/admin/FrontPageManager'
+import { Toaster } from "@/components/ui/sonner"
+
 
 function App() {
 
   return (
-    <Routes>
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/post/:slug" element={<PostView />} />
-        <Route path="/page/:slug" element={<PageView />} />
-        <Route path="/posts" element={<PostListView />} />
-        <Route path="/pages" element={<PageListView />} />
-      </Route>
+    <div>
+      <Routes>
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/post/:slug" element={<PostView />} />
+          <Route path="/page/:slug" element={<PageView />} />
+          <Route path="/posts" element={<PostListView />} />
+          <Route path="/pages" element={<PageListView />} />
+        </Route>
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="posts" element={<PostManager />} />
-        <Route path="pages" element={<PageManager />} />
-        <Route path="categories" element={<CategoryManager />} />
-        <Route path="media" element={<FileManager />} />
-        <Route path="menu" element={<MenuManager />} />
-        <Route path="front-page" element={<FrontPageManager />} />
-      </Route>
-    </Routes>
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="posts" element={<PostManager />} />
+          <Route path="pages" element={<PageManager />} />
+          <Route path="categories" element={<CategoryManager />} />
+          <Route path="media" element={<FileManager />} />
+          <Route path="menu" element={<MenuManager />} />
+          <Route path="front-page" element={<FrontPageManager />} />
+        </Route>
+      </Routes>
+      <Toaster />
+    </div>
   )
 }
 

@@ -51,61 +51,55 @@
 
   /* Code block syntax highlighting */
   .prose pre {
-    @apply bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto my-4;
+    @apply bg-transparent p-0 m-0 rounded-none overflow-x-auto;
   }
 
   .prose code {
-    @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm;
+    @apply bg-muted text-foreground px-1.5 py-0.5 rounded text-sm;
   }
 
   .prose pre code {
-    @apply bg-transparent p-0 text-sm;
+    @apply bg-transparent p-0 text-sm text-foreground;
   }
 
-  /* Highlight.js syntax colors */
-  .hljs-comment,
-  .hljs-quote {
-    @apply text-gray-500 italic;
+  /* Custom Highlight.js syntax colors for Theme Compatibility */
+  .dark .hljs-comment,
+  .dark .hljs-quote {
+    @apply text-zinc-500 italic;
   }
 
-  .hljs-keyword,
-  .hljs-selector-tag,
-  .hljs-subst {
-    @apply text-pink-400 font-semibold;
+  .dark .hljs-keyword,
+  .dark .hljs-selector-tag {
+    @apply text-yellow-500 font-semibold; /* Primary/Yellow Accent */
   }
 
-  .hljs-number,
-  .hljs-literal,
-  .hljs-variable,
-  .hljs-template-variable {
-    @apply text-orange-400;
+  .dark .hljs-string,
+  .dark .hljs-title,
+  .dark .hljs-section,
+  .dark .hljs-doctag {
+    @apply text-orange-400; /* Warm complementary */
   }
 
-  .hljs-string,
-  .hljs-doctag {
-    @apply text-green-400;
+  .dark .hljs-number,
+  .dark .hljs-literal {
+    @apply text-blue-400;
   }
 
-  .hljs-title,
-  .hljs-section,
-  .hljs-selector-id {
-    @apply text-blue-400 font-semibold;
+  .dark .hljs-type,
+  .dark .hljs-class .hljs-title {
+    @apply text-yellow-300;
   }
 
-  .hljs-type,
-  .hljs-class .hljs-title {
-    @apply text-yellow-400;
+  .dark .hljs-variable,
+  .dark .hljs-template-variable,
+  .dark .hljs-attribute {
+    @apply text-zinc-300;
   }
-
-  .hljs-tag,
-  .hljs-name,
-  .hljs-attribute {
-    @apply text-cyan-400;
-  }
-
-  .hljs-built_in,
-  .hljs-builtin-name {
-    @apply text-teal-400;
+  
+  .dark .hljs-function,
+  .dark .hljs-built_in, 
+  .dark .hljs-builtin-name {
+     @apply text-amber-200;
   }
 }
 

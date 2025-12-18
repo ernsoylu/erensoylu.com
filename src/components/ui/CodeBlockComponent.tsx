@@ -1,10 +1,17 @@
 import { NodeViewWrapper, NodeViewContent } from '@tiptap/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const CodeBlockComponent = ({ node, updateAttributes }: any) => {
     const [copied, setCopied] = useState(false)
+    const [lineCount, setLineCount] = useState(1)
+
+    useEffect(() => {
+        // Count lines in the code block
+        const lines = (node.textContent || '').split('\n').length
+        setLineCount(lines)
+    }, [node.textContent])
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(node.textContent)
@@ -17,49 +24,67 @@ export const CodeBlockComponent = ({ node, updateAttributes }: any) => {
         'c', 'cpp', 'go', 'rust', 'julia', 'sql', 'html', 'css'
     ]
 
+    const currentLanguage = node.attrs.language || 'javascript'
+
     return (
-        <NodeViewWrapper className="code-block-wrapper my-4">
-            <div className="relative rounded-lg overflow-hidden border border-border bg-gray-900">
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                    <select
-                        value={node.attrs.language || 'javascript'}
-                        onChange={(e) => updateAttributes({ language: e.target.value })}
-                        className="bg-gray-700 text-gray-200 text-sm rounded px-2 py-1 border-none outline-none cursor-pointer"
-                        contentEditable={false}
-                    >
-                        {languages.map(lang => (
-                            <option key={lang} value={lang}>
-                                {lang.toUpperCase()}
-                            </option>
-                        ))}
-                    </select>
+        <NodeViewWrapper className="code-block-wrapper my-6">
+            <div className="relative rounded-lg overflow-hidden border border-border bg-card shadow-sm">
+                {/* Header with language and copy button */}
+                <div className="flex items-center justify-between px-4 py-2 bg-muted border-b border-border">
+                    <div className="flex items-center gap-3">
+                        <select
+                            value={currentLanguage}
+                            onChange={(e) => updateAttributes({ language: e.target.value })}
+                            className="bg-transparent text-muted-foreground text-sm font-medium rounded px-2 py-1 hover:text-foreground hover:bg-background/50 transition-colors uppercase outline-none cursor-pointer"
+                            contentEditable={false}
+                        >
+                            {languages.map(lang => (
+                                <option key={lang} value={lang}>
+                                    {lang}
+                                </option>
+                            ))}
+                        </select>
+                        <span className="text-muted-foreground/50 text-xs select-none">{lineCount} {lineCount === 1 ? 'line' : 'lines'}</span>
+                    </div>
 
                     <Button
                         size="sm"
                         variant="ghost"
                         onClick={copyToClipboard}
-                        className="h-7 text-gray-300 hover:text-white hover:bg-gray-700"
+                        className="h-7 px-2 text-muted-foreground hover:text-primary hover:bg-background/50 transition-colors"
                         contentEditable={false}
                     >
                         {copied ? (
                             <>
-                                <Check className="w-4 h-4 mr-1" />
+                                <Check className="w-3.5 h-3.5 mr-1.5" />
                                 Copied
                             </>
                         ) : (
                             <>
-                                <Copy className="w-4 h-4 mr-1" />
+                                <Copy className="w-3.5 h-3.5 mr-1.5" />
                                 Copy
                             </>
                         )}
                     </Button>
                 </div>
 
-                {/* Code Content */}
-                <pre className="p-4 overflow-x-auto">
-                    <NodeViewContent className="language-{node.attrs.language}" />
-                </pre>
+                {/* Code content with line numbers */}
+                <div className="flex relative bg-card">
+                    {/* Line numbers */}
+                    <div
+                        className="select-none py-4 px-4 border-r border-border text-muted-foreground/40 text-sm font-mono leading-6 text-right min-w-[3.5rem]"
+                        contentEditable={false}
+                    >
+                        {Array.from({ length: lineCount }, (_, i) => (
+                            <div key={i + 1}>{i + 1}</div>
+                        ))}
+                    </div>
+
+                    {/* Code */}
+                    <pre className="flex-1 p-0 m-0 overflow-x-auto bg-transparent">
+                        <NodeViewContent className="block py-4 px-4 text-sm font-mono leading-6 text-foreground/90 tabular-nums" />
+                    </pre>
+                </div>
             </div>
         </NodeViewWrapper>
     )
