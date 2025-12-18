@@ -528,8 +528,11 @@ export const Footer = ({ copyrightText, links, socialLinks }: any) => (
 // 28. Latest Pages
 export const LatestPages = ({ title, limit }: any) => {
     const [pages, setPages] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         const fetchPages = async () => {
+            setLoading(true);
             const { data } = await supabase
                 .from("pages")
                 .select("*")
@@ -537,6 +540,7 @@ export const LatestPages = ({ title, limit }: any) => {
                 .order("created_at", { ascending: false })
                 .limit(limit || 6);
             if (data) setPages(data);
+            setLoading(false);
         };
         fetchPages();
     }, [limit]);
@@ -544,22 +548,37 @@ export const LatestPages = ({ title, limit }: any) => {
     return (
         <section className="container mx-auto px-4 py-12">
             {title && <h2 className="text-3xl font-bold mb-8 text-center">{title}</h2>}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pages.map((page) => (
-                    <Link key={page.id} to={`/page/${page.slug}`} className="group">
-                        <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
-                            <CardHeader className="p-6">
-                                <CardTitle className="text-xl leading-tight group-hover:text-primary transition-colors">
-                                    {page.title}
-                                </CardTitle>
-                                <CardDescription className="line-clamp-3 mt-2">
-                                    {page.excerpt || "Read more..."}
-                                </CardDescription>
-                            </CardHeader>
-                        </Card>
-                    </Link>
-                ))}
-            </div>
+            {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="h-48 bg-muted rounded-xl animate-pulse" />
+                    ))}
+                </div>
+            ) : pages.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {pages.map((page) => (
+                        <Link key={page.id} to={`/page/${page.slug}`} className="group">
+                            <Card className="h-full overflow-hidden transition-all hover:shadow-md border-border/50 bg-card/50 hover:bg-card">
+                                <CardHeader className="p-6">
+                                    <CardTitle className="text-xl leading-tight group-hover:text-primary transition-colors">
+                                        {page.title}
+                                    </CardTitle>
+                                    <CardDescription className="line-clamp-3 mt-2">
+                                        {page.excerpt || "Read more..."}
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                        </Link>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-12 bg-muted/30 rounded-2xl border-dashed border-2">
+                    <p className="text-muted-foreground">No published pages yet. Create some pages in the admin panel!</p>
+                    <Button asChild variant="link" className="mt-2">
+                        <Link to="/admin/pages">Go to Page Manager</Link>
+                    </Button>
+                </div>
+            )}
         </section>
     );
 };
