@@ -1,9 +1,9 @@
 source "https://rubygems.org"
 
 gem "jekyll", "~> 4.3.4"
+gem "jekyll-theme-chirpy", "~> 7.1"
 
 group :jekyll_plugins do
-  gem "jekyll-theme-chirpy", github: "cotes2020/jekyll-theme-chirpy", tag: "v7.1.1"
   gem "jekyll-paginate"
   gem "jekyll-redirect-from"
   gem "jekyll-seo-tag"
