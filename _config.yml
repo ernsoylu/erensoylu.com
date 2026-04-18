@@ -5,9 +5,10 @@ url: "https://erensoylu.com" # the base hostname & protocol for your site
 author: Eren Soylu
 
 markdown: kramdown
-theme: minima # we will override this with our own layouts
+# theme: minima # removed to use custom local layouts
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 
 # Exclude from processing.
 exclude:
