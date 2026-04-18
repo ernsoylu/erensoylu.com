@@ -20,7 +20,7 @@ author:
 #
 # Theme Settings
 #
-theme: jekyll-theme-chirpy
+# theme: jekyll-theme-chirpy # Already handled as a plugin below
 
 # Simple or Elegant
 # theme_mode: "" # [light|dark] - leave empty to follow system preference
