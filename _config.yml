@@ -4,8 +4,7 @@
 title: Eren Soylu
 tagline: Personal Blog & Portfolio
 description: >- # used by search engines
-  A modern, elegant personal blog focused on software and design.
-
+  Control System Architect, Software Developer, Energy Systems Engineer
 # The subpath of your site, e.g. /blog
 baseurl: ""
 
@@ -14,7 +13,6 @@ url: "https://erensoylu.com"
 
 author:
   name: Eren Soylu
-  twitter: erensoylu
   github: ernsoylu
 
 #
@@ -86,6 +84,7 @@ exclude:
   - .jekyll-cache
   - .sass-cache
   - .gemini
+  - .claude
   - README.md
   - LICENSE
   - docs
@@ -96,10 +95,10 @@ exclude:
 # Chirpy Settings
 #
 google_analytics:
-  id: '' # fill in your GA id
+  id: "" # fill in your GA id
 
 disqus:
-  shortname: '' # fill in your disqus shortname
+  shortname: "" # fill in your disqus shortname
 
 #
 # Last Modification Date for each post
