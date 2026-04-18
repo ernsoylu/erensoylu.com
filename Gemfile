@@ -11,5 +11,5 @@ group :jekyll_plugins do
   gem "jekyll-archives"
   gem "jekyll-sitemap"
   gem "jekyll-feed"
-  gem "jekyll-remote-theme" # Add this to support custom themes
+  gem "jekyll-include-cache"
 end

@@ -21,7 +21,7 @@ author:
 #
 # Theme Settings
 #
-remote_theme: cotes2020/jekyll-theme-chirpy
+theme: jekyll-theme-chirpy
 
 plugins:
   - jekyll-paginate
@@ -29,8 +29,8 @@ plugins:
   - jekyll-seo-tag
   - jekyll-archives
   - jekyll-sitemap
-  - jekyll-theme-chirpy
-  - jekyll-remote-theme
+  - jekyll-feed
+  - jekyll-include-cache
 
 #
 # Pagination
