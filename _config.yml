@@ -16,13 +16,21 @@ author:
   name: Eren Soylu
   twitter: erensoylu
   github: ernsoylu
-  # fill in more social links as needed
 
 #
 # Theme Settings
 #
 theme: jekyll-theme-chirpy
 
+# Simple or Elegant
+# theme_mode: "" # [light|dark] - leave empty to follow system preference
+
+lang: en
+timezone: UTC
+
+#
+# Plugins
+#
 plugins:
   - jekyll-paginate
   - jekyll-redirect-from
@@ -31,6 +39,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-feed
   - jekyll-include-cache
+  - jekyll-theme-chirpy # REQUIRED for Chirpy assets and layouts to load correctly
 
 #
 # Pagination
@@ -61,3 +70,30 @@ exclude:
   - README.md
   - LICENSE
   - docs
+  - .github
+  - _scripts
+
+#
+# Chirpy Settings
+#
+google_analytics:
+  id: '' # fill in your GA id
+
+disqus:
+  shortname: '' # fill in your disqus shortname
+
+#
+# Last Modification Date for each post
+#
+lastmod:
+  enabled: true
+  ignore:
+    - _posts/2026-04-18-welcome.md
+
+#
+# Avatar Settings
+#
+avatar:
+  url: 'https://avatars.githubusercontent.com/u/12345678' # example
+  width: 100
+  height: 100
