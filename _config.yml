@@ -29,6 +29,14 @@ lang: en
 timezone: UTC
 
 #
+# Collections
+#
+collections:
+  tabs:
+    output: true
+    sort_by: order
+
+#
 # Front Matter Defaults
 #
 defaults:
