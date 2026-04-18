@@ -29,6 +29,18 @@ lang: en
 timezone: UTC
 
 #
+# Front Matter Defaults
+#
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+      toc: true
+      comments: false
+
+#
 # Plugins
 #
 plugins:
