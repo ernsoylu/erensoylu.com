@@ -104,7 +104,4 @@ lastmod:
 #
 # Avatar Settings
 #
-avatar:
-  url: 'https://avatars.githubusercontent.com/u/12345678' # example
-  width: 100
-  height: 100
+avatar: /assets/img/Eren_SOYLU.png
