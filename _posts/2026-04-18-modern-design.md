@@ -1,8 +1,8 @@
 ---
-layout: post
 title: "The Essence of Modern Minimalist Design"
 date: 2026-04-18 14:30:00 +0000
-categories: design
+categories: [Design, Minimalism]
+tags: [web, aesthetics]
 excerpt: "Exploring the principles of minimalism and how they can be applied to build elegant, high-impact websites."
 ---
 

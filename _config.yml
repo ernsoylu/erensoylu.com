@@ -1,22 +1,71 @@
+#
+# Site Settings
+#
 title: Eren Soylu
-description: Personal Blog & Portfolio
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://erensoylu.com" # the base hostname & protocol for your site
-author: Eren Soylu
+tagline: Personal Blog & Portfolio
+description: >- # used by search engines
+  A modern, elegant personal blog focused on software and design.
 
-markdown: kramdown
-# theme: minima # removed to use custom local layouts
+# The subpath of your site, e.g. /blog
+baseurl: ""
+
+# The base hostname & protocol for your site, e.g. http://localhost:4000
+url: "https://erensoylu.com"
+
+author:
+  name: Eren Soylu
+  twitter: erensoylu
+  github: ernsoylu
+  # fill in more social links as needed
+
+#
+# Theme Settings
+#
+theme: jekyll-theme-chirpy
+
+# Simple or Elegant
+# theme_mode: "" # [light|dark] - leave empty to follow system preference
+
+lang: en
+timezone: UTC
+
+#
+# Plugins
+#
 plugins:
-  - jekyll-feed
+  - jekyll-paginate
+  - jekyll-redirect-from
   - jekyll-seo-tag
+  - jekyll-archives
+  - jekyll-sitemap
+  - jekyll-theme-chirpy
 
-# Exclude from processing.
+#
+# Pagination
+#
+paginate: 10
+paginate_path: "/page:num/"
+
+#
+# Markdown
+#
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+#
+# Exclude from processing
+#
 exclude:
-  - .sass-cache/
-  - .jekyll-cache/
-  - gemini-tmp/
-  - vendor/bundle/
-  - vendor/cache/
-  - vendor/gems/
-  - vendor/ruby/
-  - plans/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .jekyll-cache
+  - .sass-cache
+  - .gemini
+  - README.md
+  - LICENSE
+  - docs
