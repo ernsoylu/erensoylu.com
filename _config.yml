@@ -39,7 +39,6 @@ plugins:
   - jekyll-sitemap
   - jekyll-feed
   - jekyll-include-cache
-  - jekyll-theme-chirpy
 
 #
 # Pagination
