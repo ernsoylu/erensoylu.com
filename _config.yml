@@ -1,0 +1,21 @@
+title: Eren Soylu
+description: Personal Blog & Portfolio
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://erensoylu.com" # the base hostname & protocol for your site
+author: Eren Soylu
+
+markdown: kramdown
+theme: minima # we will override this with our own layouts
+plugins:
+  - jekyll-feed
+
+# Exclude from processing.
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemini-tmp/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - plans/
