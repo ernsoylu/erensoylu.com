@@ -39,7 +39,6 @@ plugins:
   - jekyll-sitemap
   - jekyll-feed
   - jekyll-include-cache
-  - jekyll-theme-chirpy # REQUIRED for Chirpy assets and layouts to load correctly
 
 #
 # Pagination
