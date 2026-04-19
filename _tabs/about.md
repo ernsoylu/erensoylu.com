@@ -2,7 +2,7 @@
 layout: page
 title: About
 icon: fas fa-circle-user
-order: 5
+order: 6
 ---
 
 Welcome to my blog. I am an engineer who specialised on powertrain software
