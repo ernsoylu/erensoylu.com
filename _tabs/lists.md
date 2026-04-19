@@ -1,6 +1,4 @@
-
 ---
-
 layout: page
 title: Lists
 icon: fas fa-list
