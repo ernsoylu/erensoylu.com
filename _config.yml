@@ -2,9 +2,10 @@
 # Site Settings
 #
 title: Eren Soylu
-tagline: Personal Blog & Portfolio
+tagline: control - software - energy systems
 description: >- # used by search engines
-  Control System Architect, Software Developer, Energy Systems Engineer
+  Control Systems Architect working on automotive powertrain software. Writing on control systems, embedded software, and energy systems engineering.
+social_preview_image: /assets/img/default-og.jpg
 # The subpath of your site, e.g. /blog
 baseurl: ""
 
@@ -18,16 +19,23 @@ author:
 github:
   username: ernsoylu
 
+social:
+  name: Eren Soylu
+  email: "" # fill in a contact email
+  links:
+    - https://github.com/ernsoylu
+    - https://uk.linkedin.com/in/erensoylu
+
 #
 # Theme Settings
 #
 theme: jekyll-theme-chirpy
 
 # Simple or Elegant
-# theme_mode: "" # [light|dark] - leave empty to follow system preference
+theme_mode: "" # [light|dark] - leave empty so both themes compile and the toggle stays available; dark is the primary design, light follows system preference
 
-lang: en
-timezone: UTC
+lang: en-GB
+timezone: Europe/London
 
 #
 # Collections
@@ -58,8 +66,12 @@ plugins:
   - jekyll-seo-tag
   - jekyll-archives
   - jekyll-sitemap
-  - jekyll-feed
   - jekyll-include-cache
+
+#
+# Permalinks
+#
+permalink: /:year/:month/:day/:title/
 
 #
 # Pagination
@@ -97,21 +109,29 @@ exclude:
 #
 # Chirpy Settings
 #
-google_analytics:
-  id: "" # fill in your GA id
 
-disqus:
-  shortname: "" # fill in your disqus shortname
+# Privacy-friendly, no Google Analytics. Sign up at goatcounter.com and fill in the id.
+analytics:
+  goatcounter:
+    id: "" # fill in your GoatCounter id
+
+# GitHub Discussions-backed comments. Set up at giscus.app, fill in the fields below,
+# then flip `comments: true` on individual posts to enable.
+comments:
+  provider: giscus
+  giscus:
+    repo: "" # fill in "username/repo"
+    repo_id: ""
+    category: ""
+    category_id: ""
 
 #
 # Last Modification Date for each post
 #
 lastmod:
   enabled: true
-  ignore:
-    - _posts/2026-04-18-welcome.md
 
 #
 # Avatar Settings
 #
-avatar: /assets/img/Eren_SOYLU.png
+avatar: /assets/img/avatar.jpg

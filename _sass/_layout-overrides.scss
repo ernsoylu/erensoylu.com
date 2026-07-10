@@ -1,0 +1,219 @@
+// Blueprint direction: structure via 1px borders, not drop shadows.
+.card,
+.post-preview,
+.card-wrapper {
+  border: 1px solid var(--main-border-color);
+}
+
+a {
+  transition: color var(--transition-fast), background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+#sidebar {
+  .nav-link,
+  .sidebar-bottom .mode-toggle,
+  #avatar img {
+    transition: background-color var(--transition-fast), color var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+}
+
+.tabs.nav > .nav-item .nav-link.active {
+  border-bottom: 2px solid var(--sidebar-active-color);
+}
+
+.project-list {
+  .project-card {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--main-border-color);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    h5 {
+      font-family: var(--font-family-heading, 'Space Grotesk', sans-serif);
+      margin-bottom: 0.35rem;
+    }
+
+    p {
+      color: var(--text-muted-color);
+      margin-bottom: 0;
+    }
+  }
+
+  .project-meta {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.75;
+    margin-bottom: 0.6rem;
+  }
+}
+
+.list-section {
+  margin-bottom: 1rem;
+
+  dl {
+    margin: 0;
+  }
+
+  dt {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-weight: 700;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--main-border-color);
+
+    &:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    em {
+      font-weight: 400;
+      font-style: normal;
+      color: var(--text-muted-color);
+    }
+  }
+
+  .list-year {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted-color);
+    font-weight: 400;
+  }
+
+  dd {
+    margin: 0.25rem 0 0;
+    padding-bottom: 1.1rem;
+    color: var(--text-muted-color);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+}
+
+.about-columns {
+  display: flex;
+  gap: 2.5rem;
+  margin: 1.5rem 0;
+
+  > div {
+    flex: 1;
+  }
+
+  h5 {
+    font-family: var(--font-family-heading, 'Space Grotesk', sans-serif);
+    color: var(--link-color);
+    font-size: 1.1rem;
+  }
+
+  p {
+    color: var(--text-muted-color);
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 767.98px) {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
+
+.timeline-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted-color);
+}
+
+.about-timeline {
+  margin-top: 1rem;
+
+  dl {
+    margin: 0;
+  }
+
+  dt {
+    position: relative;
+    padding-left: 1.1rem;
+    padding-top: 1rem;
+    font-weight: 700;
+
+    &:first-child {
+      padding-top: 0.5rem;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 1.55rem;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--link-color);
+    }
+
+    &:first-child::before {
+      top: 1.05rem;
+    }
+  }
+
+  dd {
+    margin: 0.25rem 0 0 1.1rem;
+    padding-bottom: 0.5rem;
+    color: var(--text-muted-color);
+    font-size: 0.9rem;
+  }
+}
+
+.error-404 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 50vh;
+  text-align: center;
+
+  &__code {
+    font-family: var(--font-family-heading, 'Space Grotesk', sans-serif);
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--link-color);
+    margin: 0;
+    line-height: 1;
+  }
+
+  &__message {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+    margin: 0;
+  }
+
+  &__submessage {
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+    margin: 0 0 0.5rem;
+  }
+
+  &__link {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius);
+    background-color: var(--link-color);
+    color: var(--sidebar-bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    text-decoration: none;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}

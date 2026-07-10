@@ -1,0 +1,22 @@
+---
+---
+
+@use 'abstracts/variables' with (
+  $theme: '{{ site.theme_mode }}',
+  $font-family-base: ('Inter', -apple-system, BlinkMacSystemFont, sans-serif),
+  $font-family-heading: ('Space Grotesk', -apple-system, sans-serif),
+  $radius-sm: 6px,
+  $radius-lg: 6px
+);
+
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/* append your custom style below */
+@import "palette";
+@import "typography";
+@import "layout-overrides";
