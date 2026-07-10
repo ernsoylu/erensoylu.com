@@ -41,6 +41,15 @@ a {
       color: var(--text-muted-color);
       margin-bottom: 0;
     }
+
+    p:last-of-type {
+      margin-top: 0.6rem;
+
+      a {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+      }
+    }
   }
 
   .project-meta {

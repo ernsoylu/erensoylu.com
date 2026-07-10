@@ -9,46 +9,56 @@ order: 1
 
 <div class="project-card" markdown="1">
 
-##### ECU Cold-Boot Optimization
-<span class="project-meta">2025 · Systems Architecture · AUTOSAR, Embedded C</span>
+##### frees
+<span class="project-meta">2026 · Engineering Software · Java, React/TypeScript</span>
 
-Cut cold-boot latency from 4.2s to 1.8s across a partitioned ECU stack by restructuring the timing contracts governing driver initialization order.
+A web-based, open-source equation-solving environment for engineers. Systems of non-linear equations are decomposed via bipartite matching and Tarjan SCC, solved with Newton's method, behind a Spring Boot API — with an acausal, multi-domain modeling layer for power, thermal, and control systems on top.
 
-</div>
-
-<div class="project-card" markdown="1">
-
-##### Torque Blending Strategy for Hybrid Powertrains
-<span class="project-meta">2023 · Control Systems · Simulink, C</span>
-
-Designed the arbitration layer between combustion and electric torque requests during transient handoff, validated against NVH targets.
+[View on GitHub →](https://github.com/ernsoylu/frees)
 
 </div>
 
 <div class="project-card" markdown="1">
 
-##### EROS
-<span class="project-meta">2026 · Personal project · C, AVR</span>
+##### ERC
+<span class="project-meta">2026 · Networking · Elixir</span>
 
-A minimal real-time OS for AVR microcontrollers built around AUTOSAR-style OOP patterns, written to understand scheduling guarantees from first principles.
+An IRC server built on Elixir/OTP, implementing RFC 1459/2812 with IRCv3 CAP negotiation — leaning on BEAM concurrency and Mnesia distributed state instead of the usual single-process daemon model.
 
-</div>
-
-<div class="project-card" markdown="1">
-
-##### frEES
-<span class="project-meta">2026 · Personal project · Python</span>
-
-A thermodynamics analysis tool that unifies table and spreadsheet-style data entry for fast property lookups.
+[View on GitHub →](https://github.com/ernsoylu/ERC)
 
 </div>
 
 <div class="project-card" markdown="1">
 
-##### Tube Preamp Build Log
-<span class="project-meta">2025 · DIY electronics · Analog circuits</span>
+##### EROS-AVR
+<span class="project-meta">2025 · Embedded Systems · C, AVR</span>
 
-A from-schematic build of a classic tube preamp clone, documented end-to-end from BOM sourcing to bias trimming by ear.
+An ultra-minimalist, non-preemptive real-time kernel implementing the OSEK/VDX BCC1 task model on a bare ATmega328P. Pure bare-metal C99 — no Arduino framework, no heap, no runtime object creation.
+
+[View on GitHub →](https://github.com/ernsoylu/EROS-AVR)
+
+</div>
+
+<div class="project-card" markdown="1">
+
+##### TDM
+<span class="project-meta">2026 · CLI Tool · Go</span>
+
+A terminal download manager powered by an aria2c daemon, with a tiled TUI inspired by IDM's dynamic segmentation and FlashGet's crash-safe session resume.
+
+[View on GitHub →](https://github.com/ernsoylu/tdm)
+
+</div>
+
+<div class="project-card" markdown="1">
+
+##### Smuggler
+<span class="project-meta">2026 · Infrastructure · Python, Docker</span>
+
+A containerized torrent-downloading stack that isolates every download inside its own VPN-tunneled container ("mule"), each with a hardware-level kill-switch. Managed via a React UI or a Python CLI.
+
+[View on GitHub →](https://github.com/ernsoylu/Smuggler)
 
 </div>
 
