@@ -37,7 +37,7 @@ Tube amplifier circuits, the history of standardization, and the point where a g
 : Apr 2024 – Present · United Kingdom · Electric Vehicles
 
 **Project Engineer, Thermal Energy Management — HORIBA MIRA**
-: Dec 2022 – Apr 2024 · Nuneaton, England · Hybrid
+: Dec 2022 – Apr 2024 · Nuneaton, United Kingdom · Hybrid
 
 **e-Powertrain Control Specialist — TOFAŞ Türk Otomobil Fabrikası A.Ş.**
 : Feb 2022 – Oct 2022 · Bursa, Türkiye
