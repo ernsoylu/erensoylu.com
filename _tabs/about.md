@@ -61,5 +61,3 @@ Tube amplifier circuits, the history of standardization, and the point where a g
 : Jul 2013 – Aug 2013 · fluid systems and boiler/burner analysis for power plant control
 
 </div>
-
-See [Projects]({{ '/tabs/projects/' | relative_url }}) for specific work, or the [latest post]({{ '/' | relative_url }}) for what I'm writing about right now.

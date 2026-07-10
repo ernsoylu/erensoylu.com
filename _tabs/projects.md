@@ -5,6 +5,8 @@ icon: fas fa-diagram-project
 order: 1
 ---
 
+<span class="timeline-header">PERSONAL PROJECTS</span>
+
 <div class="project-list">
 
 <div class="project-card" markdown="1">
