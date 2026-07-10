@@ -32,20 +32,29 @@ Updated as I go. No star ratings — the note is the rating.
 
 <div class="list-section" markdown="1">
 
-**Chernobyl** — *HBO* <span class="list-year">2019</span>
-: The best depiction of a control system failing under organizational pressure I've seen.
+**[Chernobyl](https://www.imdb.com/title/tt7366338/)** — *HBO* <span class="list-year">2019</span>
 
-**Formula 1: Drive to Survive** — *Netflix* <span class="list-year">2024</span>
-: Guilty pleasure; the systems-engineering subplot is better than advertised.
+**[Formula 1: Drive to Survive](https://www.imdb.com/title/tt8289930/)** — *Netflix* <span class="list-year">2024</span>
 
-**The Bear** — *FX* <span class="list-year">2024</span>
-: Kitchens and ECUs have more in common than either industry admits.
+**[The Bear](https://www.imdb.com/title/tt14452776/)** — *FX* <span class="list-year">2024</span>
 
-**Kiki's Delivery Service** — *Miyazaki* <span class="list-year">1989</span>
-: Rewatch whenever a project needs a reset.
+**[Kiki's Delivery Service](https://www.imdb.com/title/tt0097814/)** — *Miyazaki* <span class="list-year">1989</span>
 
-**Blade Runner 2049** — *Villeneuve* <span class="list-year">2017</span>
-: For the sound design alone.
+**[Blade Runner 2049](https://www.imdb.com/title/tt1856101/)** — *Villeneuve* <span class="list-year">2017</span>
+
+**[For All Mankind](https://www.imdb.com/title/tt7772588/)** — *Apple TV+* <span class="list-year">2019</span>
+
+**[Star City](https://www.imdb.com/title/tt32140872/)** — *Apple TV+* <span class="list-year">2026</span>
+
+**[Landman](https://www.imdb.com/title/tt14186672/)** — *Paramount+* <span class="list-year">2024</span>
+
+**[MobLand](https://www.imdb.com/title/tt31510819/)** — *Paramount+* <span class="list-year">2025</span>
+
+**[Silo](https://www.imdb.com/title/tt14688458/)** — *Apple TV+* <span class="list-year">2023</span>
+
+**[Tulsa King](https://www.imdb.com/title/tt16358384/)** — *Paramount+* <span class="list-year">2022</span>
+
+**[Dutton Ranch](https://www.imdb.com/title/tt34991493/)** — *Paramount+* <span class="list-year">2025</span>
 
 </div>
 
