@@ -24,13 +24,7 @@ and cybersecurity.
 
 ## How I like to work
 
-Small changes, shipped often, with a way to tell whether they worked. I am
-suspicious of abstractions that exist before the second use case, and of any
-system whose failure mode is "we'll notice eventually".
 
-The most useful thing I have learned is that hardware never matches the model.
-A clock drifts, a sensor reads a few percent off, a PWM driver runs fast. Leave
-the calibration knob in — the physical world will need it.
 
 ## This site
 
