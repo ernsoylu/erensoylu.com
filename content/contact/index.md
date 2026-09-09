@@ -5,8 +5,7 @@ subtitle: The quickest ways to reach me.
 I read everything that arrives, and I reply to some of it. If you are writing
 about work, a rough outline of the problem is far more useful than a job title.
 
-
-## Socials 
+## Socials
 
 | Where | What it is good for |
 | --- | --- |

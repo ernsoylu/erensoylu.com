@@ -2,26 +2,25 @@
 title: About
 subtitle: Engineer, thinker, art enthusiast
 ---
-I build software for automotive that keep your car running on the road. 
-My work vary across embedded controller to simulating digital twins 
-for thermal systems, propulsion systems etc. I trained as Energy Engineer and 
-improve myself in the automotive domain on the road and got experienced at startups to major
-automotive manufacturers and world class automotive test centers and engineering suppliers.
-Currently occupied as a Lead Control System Architect at Jaguar Land Rover LTD. 
+I build software for the automotive industry — the kind that keeps your car running on the road.
+My work spans embedded controllers to digital twin simulations for thermal and propulsion systems.
+I trained as an Energy Engineer and have worked my way through the automotive domain, from startups
+to major manufacturers and world-class test centers. I currently work as a Lead Control System
+Architect at Jaguar Land Rover.
 
-I like investigating new technologies as well as the old ones. 
+I like digging into new technologies, and occasionally old ones too.
+
 ## What I work on
 
-- **Control Systems.** Where I earn my bread and butter. I am developing powertrain control 
-  software. Also I am interested in IOT technologies, RTOS etc.
-- **React and Web Assembly.** I invest significant amount of time in using React and 
-  Web Assembly to create modern web applicatins such as Frees and Pinwall. I discovered Rust during that journey.
-  You should check my github pages those are free ones. 
-- **Home Lab.** I have a humble Home Lab for developing local and cloud softwares made by Mini PCs 
-  and one mediocre NAS server. I am investigating and learning network technologies 
-  and network software development, web development in my local Home Lab. 
-  Also new technologies like tunneling (It is new for me) and hosting services 
-  which is reachable from the web and cyber security practises is becoming my recent interests.
+Control systems are where I spend most of my time. I develop powertrain control software and have
+a side interest in IoT and RTOS work.
+
+On the web side, I have put a fair amount of time into React and WebAssembly. That path led me to
+Rust. Two of the projects — Frees and Pinwall — are on my GitHub and free to use.
+
+I also run a home lab made up of Mini PCs and a NAS. It is where I learn network programming,
+self-hosted services, and web development outside of work. Lately I have been poking at tunneling
+and cybersecurity.
 
 ## How I like to work
 

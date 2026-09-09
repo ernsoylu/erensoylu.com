@@ -11,11 +11,11 @@ export default [
     blurb: "Records I keep coming back to, mostly while soldering.",
     byLabel: "by",
     items: [
-      { name: "Machine Head", by: "Deep Purple", year: 1978, note: "Two instruments, eight minutes, nothing wasted. The piece I put on when a problem needs quiet." },
-      { name: "Metallica (Black)", by: "Metallica", year: 1959, note: "Recorded almost entirely in first takes. It sounds like people listening to each other." },
-      { name: "The Number of the Beast", by: "Iron Maiden", year: 1982, note: "Untitled tracks, no landmarks. Perfect for long debugging sessions." },
-      { name: "Led Zeppelin I", by: "Led Zeppelin", year: 1976, note: "A whole hour built from one repeating idea that never quite repeats." },
-      { name: "Dunya Yalan Soyluyor", by: "Mor ve Otesi", year: 1911, note: "Late romanticism at the exact moment it decided to become something else." },
+      { name: "Machine Head", by: "Deep Purple", year: 1972, note: "" },
+      { name: "Metallica (Black Album)", by: "Metallica", year: 1991, note: "" },
+      { name: "The Number of the Beast", by: "Iron Maiden", year: 1982, note: "" },
+      { name: "Led Zeppelin I", by: "Led Zeppelin", year: 1969, note: "" },
+      { name: "Dünya Yalan Söylüyor", by: "Mor ve Ötesi", year: 2004, note: "" },
     ],
   },
   {
