@@ -2,15 +2,11 @@
 title: Contact
 subtitle: The quickest ways to reach me.
 ---
-I read everything that arrives, and I reply to most of it. If you are writing
+I read everything that arrives, and I reply to some of it. If you are writing
 about work, a rough outline of the problem is far more useful than a job title.
 
-## Email
 
-**[hello@erensoylu.com](mailto:hello@erensoylu.com)** — the best route for
-anything substantial. Expect a reply within a couple of days.
-
-## Elsewhere
+## Socials 
 
 | Where | What it is good for |
 | --- | --- |
@@ -20,7 +16,7 @@ anything substantial. Expect a reply within a couple of days.
 
 ## What I am open to
 
-- Interesting embedded or backend problems, contract or permanent.
+- Open-Source collaborations.
 - Reviewing a design before it becomes a migration.
 - Talking to anyone learning this stuff — I had a lot of help early on.
 

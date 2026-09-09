@@ -1,22 +1,27 @@
 ---
 title: About
-subtitle: Engineer, thinker, art enthusiast — United Kingdom.
+subtitle: Engineer, thinker, art enthusiast
 ---
-I build software for things that have to keep working: embedded controllers,
-backend services, and the deployment glue that holds them together. Most of my
-work sits at the boundary where firmware stops being neat and the real world
-starts being awkward — sensors that drift, clocks that lie, networks that drop
-halfway through a write.
+I build software for automotive that keep your car running on the road. 
+My work vary across embedded controller to simulating digital twins 
+for thermal systems, propulsion systems etc. I trained as Energy Engineer and 
+improve myself in the automotive domain on the road and got experienced at startups to major
+automotive manufacturers and world class automotive test centers and engineering suppliers.
+Currently occupied as a Lead Control System Architect at Jaguar Land Rover LTD. 
 
+I like investigating new technologies as well as the old ones. 
 ## What I work on
 
-- **Embedded systems.** C and Rust on ARM Cortex-M, plus the Linux side of
-  things when a board is big enough to run it. Motor control, sensor fusion,
-  and the calibration work nobody puts in the datasheet.
-- **Backend services.** Mostly Go and Python. APIs, job queues, and data
-  pipelines that need to survive a bad night without waking anyone up.
-- **Infrastructure.** Containers, CI, and observability. I would rather spend a
-  day on a good dashboard than a week guessing.
+- **Control Systems.** Where I earn my bread and butter. I am developing powertrain control 
+  software. Also I am interested in IOT technologies, RTOS etc.
+- **React and Web Assembly.** I invest significant amount of time in using React and 
+  Web Assembly to create modern web applicatins such as Frees and Pinwall. I discovered Rust during that journey.
+  You should check my github pages those are free ones. 
+- **Home Lab.** I have a humble Home Lab for developing local and cloud softwares made by Mini PCs 
+  and one mediocre NAS server. I am investigating and learning network technologies 
+  and network software development, web development in my local Home Lab. 
+  Also new technologies like tunneling (It is new for me) and hosting services 
+  which is reachable from the web and cyber security practises is becoming my recent interests.
 
 ## How I like to work
 
