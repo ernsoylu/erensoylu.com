@@ -1,0 +1,23 @@
+{# Expects `items` (array of collection entries). #}
+<ul class="flex flex-col divide-y divide-ef-bg2">
+  {% for post in items %}
+    <li class="py-5 first:pt-0">
+      <article>
+        <h3 class="text-lg font-bold leading-snug">
+          <a class="text-ef-fg transition-colors hover:text-ef-green" href="{{ post.url }}">{{ post.data.title }}</a>
+        </h3>
+        <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ef-grey1">
+          <time datetime="{{ post.date | htmlDateString }}">{{ post.date | shortDate }}</time>
+          {% for tag in post.data.tags | filterTagList %}
+            <a href="/tags/{{ tag | slugify }}/" class="transition-colors hover:text-ef-green">#{{ tag }}</a>
+          {% endfor %}
+        </div>
+        {% if post.data.subtitle %}
+          <p class="mt-2 text-sm text-ef-grey2">{{ post.data.subtitle }}</p>
+        {% endif %}
+      </article>
+    </li>
+  {% else %}
+    <li class="py-5 text-ef-grey1">No posts yet.</li>
+  {% endfor %}
+</ul>

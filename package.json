@@ -1,0 +1,27 @@
+{
+  "name": "erensoylu.com",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "eleventy --serve",
+    "build": "eleventy",
+    "clean": "rm -rf _site"
+  },
+  "author": "Eren SOYLU",
+  "license": "MIT",
+  "description": "Personal site for Eren SOYLU, built with Eleventy.",
+  "dependencies": {
+    "@11ty/eleventy": "^3.1.6",
+    "@11ty/eleventy-plugin-rss": "3.0.0",
+    "@11ty/eleventy-plugin-syntaxhighlight": "5.0.2",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@tailwindcss/typography": "0.5.20",
+    "postcss": "8.5.28",
+    "tailwindcss": "4.3.3"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,13 @@
+{# Expects `tags` = collections.tagList entries ({ tag, count }). #}
+<ul class="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+  {% for entry in tags %}
+    <li>
+      <a href="/tags/{{ entry.tag | slugify }}/"
+         style="font-size: {{ entry.weight }}rem"
+         class="text-ef-grey2 transition-colors hover:text-ef-green"
+         title="{{ entry.count }} post{{ "s" if entry.count != 1 }}">#{{ entry.tag }}</a>
+    </li>
+  {% else %}
+    <li class="text-sm text-ef-grey1">No tags yet.</li>
+  {% endfor %}
+</ul>

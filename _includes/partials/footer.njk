@@ -1,0 +1,10 @@
+<footer class="mt-16 border-t border-ef-bg2 bg-ef-bg0">
+  <div class="mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 py-6 text-sm text-ef-grey1 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <p>&copy; {{ metadata.title }} · {{ metadata.author.location }}</p>
+    <ul class="flex flex-wrap gap-4">
+      {% for link in metadata.social %}
+        <li><a class="transition-colors hover:text-ef-green" href="{{ link.url }}"{% if "http" in link.url %} rel="me noopener"{% endif %}>{{ link.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</footer>

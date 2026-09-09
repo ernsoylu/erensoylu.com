@@ -1,0 +1,60 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: favourites
+  size: 1
+  alias: category
+  addAllPagesToCollections: true
+eleventyComputed:
+  title: "{{ category.title }}"
+  description: "{{ category.blurb }}"
+permalink: "/favourites/{{ category.slug }}/"
+---
+<div class="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+  <header class="mb-8">
+    <p class="text-sm text-ef-grey1"><a class="transition-colors hover:text-ef-green" href="/favourites/">← All favourites</a></p>
+    <h1 class="mt-2 text-2xl font-bold text-ef-green sm:text-3xl">{{ category.title }}</h1>
+    <p class="mt-2 text-ef-grey2">{{ category.blurb }}</p>
+  </header>
+
+  <ol class="flex flex-col divide-y divide-ef-bg2">
+    {% for item in category.items %}
+      <li class="flex gap-4 py-5 first:pt-0">
+        <span class="w-6 shrink-0 pt-0.5 text-sm tabular-nums text-ef-grey0">{{ loop.index }}</span>
+        <div class="min-w-0">
+          <h2 class="font-bold leading-snug text-ef-fg">
+            {%- if item.url -%}
+              <a class="transition-colors hover:text-ef-green" href="{{ item.url }}" rel="noopener">{{ item.name }}</a>
+            {%- else -%}
+              {{ item.name }}
+            {%- endif -%}
+          </h2>
+          {% if item.by or item.year %}
+            <p class="mt-0.5 text-xs text-ef-grey1">
+              {%- if item.by %}{{ category.byLabel or "by" }} {{ item.by }}{% endif -%}
+              {%- if item.by and item.year %} · {% endif -%}
+              {%- if item.year %}{{ item.year }}{% endif -%}
+            </p>
+          {% endif %}
+          {% if item.note %}
+            <p class="mt-2 text-sm leading-relaxed text-ef-grey2">{{ item.note }}</p>
+          {% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ol>
+
+  <nav class="mt-12 border-t border-ef-bg2 pt-6" aria-label="Other favourites">
+    <h2 class="mb-3 text-sm font-bold text-ef-grey2">Other lists</h2>
+    <ul class="flex flex-wrap gap-2">
+      {% for other in favourites %}
+        {% if other.slug != category.slug %}
+          <li>
+            <a href="/favourites/{{ other.slug }}/"
+               class="inline-block rounded border border-ef-bg3 px-2.5 py-1 text-sm text-ef-grey2 transition-colors hover:border-ef-green hover:text-ef-green">{{ other.title }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
+</div>

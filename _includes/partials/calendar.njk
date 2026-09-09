@@ -1,0 +1,33 @@
+{# Expects `months` from the postCalendar filter. #}
+{% for month in months %}
+  <section class="{{ 'mt-6' if not loop.first }}">
+    <h3 class="mb-2 text-sm font-bold text-ef-grey2">
+      {{ month.date | monthYear }}
+      <span class="font-normal text-ef-grey1">· {{ month.count }} post{{ "s" if month.count != 1 }}</span>
+    </h3>
+
+    <div class="calendar-grid mb-1" aria-hidden="true">
+      {% for day in ["M", "T", "W", "T", "F", "S", "S"] %}
+        <span class="text-center text-[0.65rem] text-ef-grey0">{{ day }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="calendar-grid">
+      {% for week in month.weeks %}
+        {% for cell in week %}
+          {% if not cell %}
+            <span class="calendar-day"></span>
+          {% elif cell.posts.length %}
+            <a href="{{ cell.posts[0].url }}"
+               class="calendar-day bg-ef-bg-green font-bold text-ef-green transition-colors hover:bg-ef-green hover:text-ef-bg0"
+               title="{{ cell.posts[0].data.title }}">{{ cell.day }}</a>
+          {% else %}
+            <span class="calendar-day bg-ef-bg1 text-ef-grey0">{{ cell.day }}</span>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </section>
+{% else %}
+  <p class="text-sm text-ef-grey1">No posts yet.</p>
+{% endfor %}

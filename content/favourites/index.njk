@@ -1,0 +1,36 @@
+---
+layout: layouts/base.njk
+title: Favourites
+subtitle: Lists of things I keep recommending, so I can stop repeating myself.
+permalink: /favourites/
+---
+<div class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+  <header class="mb-8">
+    <h1 class="text-2xl font-bold text-ef-green sm:text-3xl">{{ title }}</h1>
+    <p class="mt-2 max-w-2xl text-ef-grey2">{{ subtitle }}</p>
+  </header>
+
+  <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% for category in favourites %}
+      <li>
+        <a href="/favourites/{{ category.slug }}/"
+           class="group flex h-full flex-col rounded-lg border border-ef-bg2 bg-ef-bg0 p-5 transition-colors hover:border-ef-green focus-visible:border-ef-green">
+          <div class="flex items-baseline justify-between gap-3">
+            <h2 class="text-lg font-bold text-ef-fg transition-colors group-hover:text-ef-green">{{ category.title }}</h2>
+            <span class="shrink-0 text-xs text-ef-grey0">{{ category.items.length }}</span>
+          </div>
+
+          <p class="mt-2 text-sm leading-relaxed text-ef-grey2">{{ category.blurb }}</p>
+
+          <ul class="mt-4 flex flex-col gap-1 text-xs text-ef-grey1">
+            {% for item in category.items | head(3) %}
+              <li class="truncate">— {{ item.name }}</li>
+            {% endfor %}
+          </ul>
+
+          <span class="mt-auto pt-4 text-sm text-ef-grey1 transition-colors group-hover:text-ef-green" aria-hidden="true">See all →</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

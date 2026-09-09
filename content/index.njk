@@ -1,0 +1,53 @@
+---
+layout: layouts/base.njk
+title: Home
+description: Eren SOYLU — engineer, thinker and art enthusiast. Notes on embedded systems, backend work and the things I build.
+---
+<div class="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+
+  <section class="max-w-2xl">
+    <p class="text-sm text-ef-green">Hello —</p>
+    <h1 class="mt-2 text-2xl font-bold leading-snug sm:text-3xl">
+      I'm Eren, an engineer who likes systems that keep running when nobody is watching.
+    </h1>
+    <p class="mt-4 leading-relaxed text-ef-grey2">
+      I work across embedded firmware, backend services and the unglamorous glue in
+      between. This is where I keep notes on what I build, what broke, and what I'd
+      do differently.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3 text-sm">
+      <a href="/blog/" class="rounded border border-ef-green px-3 py-1.5 text-ef-green transition-colors hover:bg-ef-green hover:text-ef-bg0">Read the blog</a>
+      <a href="/about/" class="rounded border border-ef-bg3 px-3 py-1.5 text-ef-grey2 transition-colors hover:border-ef-green hover:text-ef-green">About me</a>
+      <a href="/contact/" class="rounded border border-ef-bg3 px-3 py-1.5 text-ef-grey2 transition-colors hover:border-ef-green hover:text-ef-green">Get in touch</a>
+    </div>
+  </section>
+
+  <div class="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-12">
+
+    <section aria-labelledby="latest">
+      <div class="mb-4 flex items-baseline justify-between border-b border-ef-bg2 pb-2">
+        <h2 id="latest" class="text-lg font-bold text-ef-green">Latest posts</h2>
+        <a href="/blog/" class="text-sm text-ef-grey1 transition-colors hover:text-ef-green">All posts →</a>
+      </div>
+      {% set items = collections.posts | head(5) %}
+      {% include "partials/post-list.njk" %}
+    </section>
+
+    <aside class="flex flex-col gap-10">
+      <section aria-labelledby="tags">
+        <h2 id="tags" class="mb-3 border-b border-ef-bg2 pb-2 text-lg font-bold text-ef-green">Tags</h2>
+        {% set tags = collections.tagList %}
+        {% include "partials/tag-cloud.njk" %}
+      </section>
+
+      <section aria-labelledby="calendar">
+        <div class="mb-3 flex items-baseline justify-between border-b border-ef-bg2 pb-2">
+          <h2 id="calendar" class="text-lg font-bold text-ef-green">Calendar</h2>
+          <a href="/archive/" class="text-sm text-ef-grey1 transition-colors hover:text-ef-green">Archive →</a>
+        </div>
+        {% set months = collections.posts | postCalendar(1) %}
+        {% include "partials/calendar.njk" %}
+      </section>
+    </aside>
+  </div>
+</div>

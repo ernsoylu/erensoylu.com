@@ -1,0 +1,47 @@
+---
+layout: layouts/base.njk
+---
+<div class="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+  <article>
+    <header class="mb-8 border-b border-ef-bg2 pb-6">
+      <h1 class="text-2xl font-bold text-ef-green sm:text-3xl">{{ title }}</h1>
+      {% if subtitle %}
+        <p class="mt-2 text-ef-grey2">{{ subtitle }}</p>
+      {% endif %}
+
+      <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ef-grey1">
+        {% if date %}
+          <time datetime="{{ date | htmlDateString }}">{{ date | readableDate }}</time>
+        {% endif %}
+        {% if author %}<span>· {{ author }}</span>{% endif %}
+      </div>
+
+      {% set visibleTags = tags | filterTagList %}
+      {% if visibleTags.length %}
+        <ul class="mt-4 flex flex-wrap gap-2">
+          {% for tag in visibleTags %}
+            <li>
+              <a href="/tags/{{ tag | slugify }}/"
+                 class="inline-block rounded border border-ef-bg3 bg-ef-bg1 px-2 py-0.5 text-xs text-ef-grey2 transition-colors hover:border-ef-green hover:text-ef-green">#{{ tag }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </header>
+
+    <div class="prose max-w-none">
+      {{ content | safe }}
+    </div>
+  </article>
+
+  <nav class="mt-12 flex flex-col gap-3 border-t border-ef-bg2 pt-6 text-sm sm:flex-row sm:justify-between" aria-label="Post navigation">
+    {% set previous = collections.posts | getPreviousCollectionItem %}
+    {% set next = collections.posts | getNextCollectionItem %}
+    {% if previous %}
+      <a class="text-ef-grey2 transition-colors hover:text-ef-green" href="{{ previous.url }}">← {{ previous.data.title }}</a>
+    {% else %}<span></span>{% endif %}
+    {% if next %}
+      <a class="text-ef-grey2 transition-colors hover:text-ef-green sm:text-right" href="{{ next.url }}">{{ next.data.title }} →</a>
+    {% endif %}
+  </nav>
+</div>

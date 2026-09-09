@@ -1,0 +1,253 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Tailwind scans these for class names. Paths are relative to this file. */
+@source "../**/*.{md,njk,html}";
+@source "../../_includes/**/*.njk";
+
+/* ---------------------------------------------------------------- fonts -- */
+/* Self-hosted variable JetBrains Mono: high x-height, disambiguated 0/O and
+   1/l/I, and a wide weight range from a single file. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/jetbrains-mono-latin.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/jetbrains-mono-latin-ext.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/jetbrains-mono-latin-italic.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ------------------------------------------------------------ everforest -- */
+/* sainnhe/everforest — dark, hard contrast. Hex values are the published
+   palette verbatim; only the semantic aliases below are ours. */
+@theme {
+  --color-ef-bg-dim: #1e2326;
+  --color-ef-bg0: #272e33;
+  --color-ef-bg1: #2e383c;
+  --color-ef-bg2: #374145;
+  --color-ef-bg3: #414b50;
+  --color-ef-bg4: #495156;
+  --color-ef-bg5: #4f5b58;
+  --color-ef-bg-visual: #4c3743;
+  --color-ef-bg-red: #493b40;
+  --color-ef-bg-yellow: #45443c;
+  --color-ef-bg-green: #3c4841;
+  --color-ef-bg-blue: #384b55;
+  --color-ef-bg-purple: #463f48;
+
+  --color-ef-fg: #d3c6aa;
+  --color-ef-red: #e67e80;
+  --color-ef-orange: #e69875;
+  --color-ef-yellow: #dbbc7f;
+  --color-ef-green: #a7c080;
+  --color-ef-aqua: #83c092;
+  --color-ef-blue: #7fbbb3;
+  --color-ef-purple: #d699b6;
+
+  --color-ef-grey0: #7a8478;
+  --color-ef-grey1: #859289;
+  --color-ef-grey2: #9da9a0;
+
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, monospace;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  /* Mono at body size is tiring; a little extra leading and measure buys most
+     of the readability back. */
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ef-green);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-ef-bg-visual);
+    color: var(--color-ef-fg);
+  }
+
+  /* Long words and URLs must not force a horizontal scrollbar on a phone. */
+  p, li, h1, h2, h3, h4 {
+    overflow-wrap: break-word;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Deliberately unlayered: the typography plugin defines these in
+   @layer utilities, which outranks @layer base, so a layered override loses. */
+.prose {
+  --tw-prose-body: var(--color-ef-fg);
+  --tw-prose-headings: #e4dbc4;
+  --tw-prose-lead: var(--color-ef-grey2);
+  --tw-prose-links: var(--color-ef-green);
+  --tw-prose-bold: #e4dbc4;
+  --tw-prose-counters: var(--color-ef-grey2);
+  --tw-prose-bullets: var(--color-ef-grey0);
+  --tw-prose-hr: var(--color-ef-bg3);
+  --tw-prose-quotes: var(--color-ef-grey2);
+  --tw-prose-quote-borders: var(--color-ef-green);
+  --tw-prose-captions: var(--color-ef-grey1);
+  --tw-prose-kbd: var(--color-ef-fg);
+  --tw-prose-code: var(--color-ef-aqua);
+  --tw-prose-pre-code: var(--color-ef-fg);
+  --tw-prose-pre-bg: var(--color-ef-bg0);
+  --tw-prose-th-borders: var(--color-ef-bg3);
+  --tw-prose-td-borders: var(--color-ef-bg2);
+
+  line-height: 1.75;
+}
+
+.prose a {
+  text-decoration-color: color-mix(in srgb, var(--color-ef-green) 45%, transparent);
+  text-underline-offset: 3px;
+}
+.prose a:hover {
+  color: var(--color-ef-aqua);
+  text-decoration-color: currentColor;
+}
+
+/* Inline code: the plugin's ``` quotes look like stray punctuation. */
+.prose :where(code):not(:where(pre code)) {
+  background: var(--color-ef-bg1);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-weight: 400;
+}
+.prose :where(code):not(:where(pre code))::before,
+.prose :where(code):not(:where(pre code))::after {
+  content: none;
+}
+
+/* Code blocks scroll themselves rather than widening the page. */
+.prose pre {
+  border: 1px solid var(--color-ef-bg2);
+  overflow-x: auto;
+}
+
+.prose table {
+  display: block;
+  overflow-x: auto;
+}
+
+/* ------------------------------------------------------- prism / everforest */
+.prose pre[class*="language-"],
+pre[class*="language-"] {
+  background: var(--color-ef-bg0);
+  color: var(--color-ef-fg);
+}
+.token.comment,
+.token.prolog,
+.token.cdata {
+  color: var(--color-ef-grey1);
+  font-style: italic;
+}
+.token.punctuation {
+  color: var(--color-ef-grey2);
+}
+.token.property,
+.token.symbol,
+.token.deleted {
+  color: var(--color-ef-red);
+}
+.token.boolean,
+.token.number,
+.token.constant {
+  color: var(--color-ef-purple);
+}
+.token.selector,
+.token.string,
+.token.char,
+.token.attr-value,
+.token.builtin,
+.token.inserted {
+  color: var(--color-ef-green);
+}
+.token.operator,
+.token.entity,
+.token.url {
+  color: var(--color-ef-orange);
+}
+.token.keyword,
+.token.atrule {
+  color: var(--color-ef-red);
+}
+.token.function,
+.token.class-name {
+  color: var(--color-ef-green);
+}
+.token.tag,
+.token.attr-name,
+.token.regex,
+.token.important,
+.token.variable {
+  color: var(--color-ef-yellow);
+}
+.token.bold {
+  font-weight: 700;
+}
+.token.italic {
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------- widgets -- */
+/* No-JS mobile menu: <details> supplies the toggle, CSS supplies the icons. */
+.menu-toggle {
+  list-style: none;
+}
+.menu-toggle::-webkit-details-marker {
+  display: none;
+}
+details[open] .menu-icon-closed,
+details:not([open]) .menu-icon-open {
+  display: none;
+}
+
+/* Calendar: a plain 7-column grid; the template emits no layout maths. */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+.calendar-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
