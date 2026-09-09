@@ -63,28 +63,48 @@ export default async function (eleventyConfig) {
   /* ----------------------------------------------------------- collections */
 
   eleventyConfig.addCollection("posts", (api) =>
-    api.getFilteredByTag("posts").sort((a, b) => b.date - a.date)
+    api.getFilteredByTag("posts").filter((post) => post.data.lang === "en").sort((a, b) => b.date - a.date)
   );
 
-  // Every user-facing tag, with its post count, sorted by frequency.
-  eleventyConfig.addCollection("tagList", (api) => {
-    const counts = new Map();
-    for (const item of api.getFilteredByTag("posts")) {
-      for (const tag of item.data.tags ?? []) {
-        if (tag === "posts") continue;
-        counts.set(tag, (counts.get(tag) ?? 0) + 1);
-      }
-    }
-    const max = Math.max(1, ...counts.values());
-    return [...counts.entries()]
-      .map(([tag, count]) => ({
-        tag,
-        count,
-        // Bounded font size (rem): 0.85–1.30, so one prolific tag cannot dominate.
-        weight: (0.85 + (max > 1 ? (count - 1) / (max - 1) : 0) * 0.45).toFixed(2),
-      }))
-      .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+  eleventyConfig.addCollection("postsTr", (api) =>
+    api.getFilteredByTag("posts").filter((post) => post.data.lang === "tr").sort((a, b) => b.date - a.date)
+  );
+
+  eleventyConfig.addPlugin(feedPlugin, {
+    type: "atom",
+    inputPath: "feed-tr.njk",
+    outputPath: "/tr/feed.xml",
+    collection: { name: "postsTr", limit: 20 },
+    metadata: {
+      language: "tr", title: metadata.title,
+      subtitle: "Gömülü sistemler ve yazılım üzerine notlar",
+      base: `${metadata.url}/`, author: { name: metadata.author.name },
+    },
   });
+
+  // Every user-facing tag, with its post count, sorted by frequency.
+  for (const [name, lang] of [["tagList", "en"], ["tagListTr", "tr"]]) {
+    eleventyConfig.addCollection(name, (api) => {
+      const counts = new Map();
+      for (const item of api.getFilteredByTag("posts")) {
+        if (item.data.lang !== lang) continue;
+        for (const tag of item.data.tags ?? []) {
+          if (tag === "posts") continue;
+          counts.set(tag, (counts.get(tag) ?? 0) + 1);
+        }
+      }
+      const max = Math.max(1, ...counts.values());
+      return [...counts.entries()]
+        .map(([tag, count]) => ({
+          tag,
+          count,
+          // Bounded font size (rem): 0.85–1.30, so one prolific tag cannot dominate.
+          weight: (0.85 + (max > 1 ? (count - 1) / (max - 1) : 0) * 0.45).toFixed(2),
+        }))
+        .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+    });
+
+  }
 
   /* ------------------------------------------------------------- behaviour */
 

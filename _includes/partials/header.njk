@@ -1,13 +1,14 @@
+{% set menu = [{text: "Ana sayfa (English)", url: "/"}, {text: "Blog", url: "/tr/blog/"}, {text: "Arşiv", url: "/tr/archive/"}] if lang == "tr" else nav %}
 <header class="bg-ef-bg0 border-b border-ef-bg2 relative z-50">
   <div class="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
     <a href="/" class="flex min-w-0 items-baseline gap-2 sm:gap-3">
       <span class="truncate text-base font-bold text-ef-green sm:text-lg">{{ metadata.title }}</span>
       <span class="hidden text-ef-bg4 lg:inline" aria-hidden="true">|</span>
-      <span class="hidden truncate text-sm text-ef-grey2 lg:inline">{{ metadata.description }}</span>
+      <span class="hidden truncate text-sm text-ef-grey2 lg:inline">{{ 'Mühendis, Düşünür, Sanatsever' if lang == 'tr' else metadata.description }}</span>
     </a>
 
-    <nav class="hidden gap-5 text-sm md:flex" aria-label="Main">
-      {% for item in nav %}
+    <nav class="hidden gap-5 text-sm md:flex" aria-label="{{ 'Ana menü' if lang == 'tr' else 'Main' }}">
+      {% for item in menu %}
         {% set current = (page.url == item.url) or (item.url != "/" and page.url.startsWith(item.url)) %}
         <a href="{{ item.url }}"
            class="transition-colors hover:text-ef-green {{ 'text-ef-green' if current else 'text-ef-grey2' }}"
@@ -16,12 +17,12 @@
     </nav>
 
     <details class="md:hidden">
-      <summary class="menu-toggle cursor-pointer p-1 text-ef-grey2 hover:text-ef-green" aria-label="Toggle navigation">
+      <summary class="menu-toggle cursor-pointer p-1 text-ef-grey2 hover:text-ef-green" aria-label="{{ 'Menüyü aç/kapat' if lang == 'tr' else 'Toggle navigation' }}">
         <svg class="menu-icon-closed size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         <svg class="menu-icon-open size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </summary>
-      <nav class="absolute left-0 top-full flex w-full flex-col gap-1 border-b border-ef-bg2 bg-ef-bg0 px-4 py-3 shadow-xl" aria-label="Main">
-        {% for item in nav %}
+      <nav class="absolute left-0 top-full flex w-full flex-col gap-1 border-b border-ef-bg2 bg-ef-bg0 px-4 py-3 shadow-xl" aria-label="{{ 'Ana menü' if lang == 'tr' else 'Main' }}">
+        {% for item in menu %}
           {% set current = (page.url == item.url) or (item.url != "/" and page.url.startsWith(item.url)) %}
           <a href="{{ item.url }}"
              class="rounded px-2 py-2.5 transition-colors hover:bg-ef-bg1 hover:text-ef-green {{ 'text-ef-green' if current else 'text-ef-grey2' }}"

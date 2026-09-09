@@ -1,13 +1,13 @@
 ---
 layout: layouts/base.njk
 pagination:
-  data: collections.tagList
+  data: collections.tagListTr
   size: 1
   alias: entry
   addAllPagesToCollections: true
 eleventyComputed:
   title: "#{{ entry.tag }}"
-  description: "Posts tagged #{{ entry.tag }}."
-permalink: "/tags/{{ entry.tag | slugify }}/"
+  description: "#{{ entry.tag }} etiketli yazılar."
+permalink: "/tr/tags/{{ entry.tag | slugify }}/"
 ---
 {% include "partials/tags.njk" %}

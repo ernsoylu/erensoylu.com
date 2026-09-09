@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ metadata.language }}">
+<html lang="{{ lang }}">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,10 +7,15 @@
     <meta name="description" content="{{ description or subtitle or metadata.description }}">
     <link rel="canonical" href="{{ page.url | absoluteUrl(metadata.url) }}">
 
+    {% if not pagination or pagination.pageNumber == 0 %}
+    {% for alternate in collections.all | translations(translationKey) %}
+    <link rel="alternate" hreflang="{{ alternate.data.lang }}" href="{{ alternate.url | absoluteUrl(metadata.url) }}">
+    {% endfor %}
+    {% endif %}
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23272e33'/><text x='16' y='23' font-family='monospace' font-size='20' font-weight='700' fill='%23a7c080' text-anchor='middle'>e</text></svg>">
     <link rel="preload" as="font" type="font/woff2" href="/fonts/jetbrains-mono-latin.woff2" crossorigin>
     <link rel="stylesheet" href="/css/index.css">
-    <link rel="alternate" type="application/atom+xml" title="{{ metadata.title }}" href="/feed.xml">
+    <link rel="alternate" type="application/atom+xml" title="{{ metadata.title }}" href="{{ prefix }}/feed.xml">
 
     <meta property="og:type" content="{% if layout == 'layouts/post.njk' %}article{% else %}website{% endif %}">
     <meta property="og:site_name" content="{{ metadata.title }}">
@@ -20,10 +25,17 @@
     <meta name="twitter:card" content="summary">
   </head>
   <body class="bg-ef-bg-dim text-ef-fg font-mono text-[15px] sm:text-base min-h-screen flex flex-col">
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded focus:bg-ef-bg1 focus:px-3 focus:py-2 focus:text-ef-fg">Skip to content</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-3 focus:rounded focus:bg-ef-bg1 focus:px-3 focus:py-2 focus:text-ef-fg">{{ "İçeriğe geç" if lang == "tr" else "Skip to content" }}</a>
 
     {% include "partials/header.njk" %}
 
+    {% if translationKey and (not pagination or pagination.pageNumber == 0) %}
+    <nav class="mx-auto flex w-full max-w-3xl gap-4 px-4 pt-4 text-sm text-ef-green" aria-label="{{ 'Dil' if lang == 'tr' else 'Language' }}">
+      {% for alternate in collections.all | translations(translationKey) %}
+      <a href="{{ alternate.url }}" lang="{{ alternate.data.lang }}" hreflang="{{ alternate.data.lang }}"{% if alternate.data.lang == lang %} aria-current="page"{% endif %}>{{ 'Türkçe' if alternate.data.lang == 'tr' else 'English' }}</a>
+      {% endfor %}
+    </nav>
+    {% endif %}
     <main id="main" class="flex-1 w-full">
       {{ content | safe }}
     </main>

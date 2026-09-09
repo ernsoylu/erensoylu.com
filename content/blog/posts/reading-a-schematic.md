@@ -1,4 +1,5 @@
 ---
+translationKey: reading-a-schematic
 title: Reading a schematic when you are not an electrical engineer
 subtitle: A working method for software people who have to bring up someone else's board.
 date: 2026-06-09

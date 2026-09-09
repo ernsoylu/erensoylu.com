@@ -1,0 +1,18 @@
+{% set languagePosts = collections.postsTr if lang == "tr" else collections.posts %}
+<div class="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+  <header class="mb-8">
+    <h1 class="text-2xl font-bold text-ef-green sm:text-3xl">{{ title }}</h1>
+    <p class="mt-2 text-ef-grey2">{{ subtitle }}</p>
+  </header>
+
+  <div class="grid gap-10 sm:grid-cols-[14rem_minmax(0,1fr)]">
+    <div>
+      {% set months = languagePosts | postCalendar %}
+      {% include "partials/calendar.njk" %}
+    </div>
+    <div>
+      {% set items = languagePosts %}
+      {% include "partials/post-list.njk" %}
+    </div>
+  </div>
+</div>

@@ -2,14 +2,14 @@
 translationKey: blog
 layout: layouts/base.njk
 pagination:
-  data: collections.posts
+  data: collections.postsTr
   # Small while there are only sample posts; raise to ~10 as the blog fills up.
   size: 2
   alias: posts
   reverse: false
   addAllPagesToCollections: true
 eleventyComputed:
-  title: "Blog{% if pagination.pageNumber > 0 %} — page {{ pagination.pageNumber + 1 }}{% endif %}"
-permalink: "/blog/{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 }}/{% endif %}"
+  title: "Blog{% if pagination.pageNumber > 0 %} — sayfa {{ pagination.pageNumber + 1 }}{% endif %}"
+permalink: "/tr/blog/{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 }}/{% endif %}"
 ---
 {% include "partials/blog.njk" %}

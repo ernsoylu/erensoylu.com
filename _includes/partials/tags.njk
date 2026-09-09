@@ -1,0 +1,16 @@
+<div class="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+  <header class="mb-8">
+    <p class="text-sm text-ef-grey1"><a class="transition-colors hover:text-ef-green" href="{{ prefix }}/blog/">← {{ 'Tüm yazılar' if lang == 'tr' else 'All posts' }}</a></p>
+    <h1 class="mt-2 text-2xl font-bold text-ef-green sm:text-3xl">#{{ entry.tag }}</h1>
+    <p class="mt-2 text-ef-grey2">{{ entry.count }} {{ "yazı" if lang == "tr" else ("post" if entry.count == 1 else "posts") }}.</p>
+  </header>
+
+  {% set items = collections[entry.tag] | inLanguage(lang) | reverse %}
+  {% include "partials/post-list.njk" %}
+
+  <section class="mt-12 border-t border-ef-bg2 pt-6">
+    <h2 class="mb-3 text-sm font-bold text-ef-grey2">{{ 'Diğer etiketler' if lang == 'tr' else 'Other tags' }}</h2>
+    {% set tags = (collections.tagListTr if lang == "tr" else collections.tagList) %}
+    {% include "partials/tag-cloud.njk" %}
+  </section>
+</div>

@@ -31,9 +31,11 @@ function toDate(value) {
 const RESERVED_TAGS = new Set(["all", "posts", "post"]);
 
 export default function addFilters(eleventyConfig) {
-  eleventyConfig.addFilter("readableDate", (v) => (v ? DATE_FULL.format(toDate(v)) : ""));
-  eleventyConfig.addFilter("shortDate", (v) => (v ? DATE_SHORT.format(toDate(v)) : ""));
-  eleventyConfig.addFilter("monthYear", (v) => (v ? MONTH_YEAR.format(toDate(v)) : ""));
+  eleventyConfig.addFilter("inLanguage", (posts, lang = "en") => posts.filter(post => post.data.lang === lang));
+  eleventyConfig.addFilter("translations", (pages, key) => key ? pages.filter(item => item.data.translationKey === key && (!item.data.pagination || item.data.pagination.pageNumber === 0)) : []);
+  eleventyConfig.addFilter("readableDate", (v, lang = "en") => (v ? (lang === "tr" ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "long", timeZone: "UTC" }) : DATE_FULL).format(toDate(v)) : ""));
+  eleventyConfig.addFilter("shortDate", (v, lang = "en") => (v ? (lang === "tr" ? new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) : DATE_SHORT).format(toDate(v)) : ""));
+  eleventyConfig.addFilter("monthYear", (v, lang = "en") => (v ? (lang === "tr" ? new Intl.DateTimeFormat("tr-TR", { month: "long", year: "numeric", timeZone: "UTC" }) : MONTH_YEAR).format(toDate(v)) : ""));
 
   // <time datetime> and sitemap <lastmod> both want YYYY-MM-DD.
   eleventyConfig.addFilter("htmlDateString", (v) =>

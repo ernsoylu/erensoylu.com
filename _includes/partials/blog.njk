@@ -1,0 +1,37 @@
+{% set languagePosts = collections.postsTr if lang == "tr" else collections.posts %}
+<div class="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+  <header class="mb-8">
+    <h1 class="text-2xl font-bold text-ef-green sm:text-3xl">{{ title }}</h1>
+    <p class="mt-2 text-ef-grey2">
+      {% if lang == "tr" %}Gömülü sistemler, sunucu yazılımları ve merak edip incelediğim şeyler üzerine {{ languagePosts.length }} yazı.
+      {% else %}{{ languagePosts.length }} post{{ "s" if languagePosts.length != 1 }} on embedded systems,
+      backend engineering and whatever I happen to be taking apart.{% endif %}
+    </p>
+  </header>
+
+  {% set items = posts %}
+  {% include "partials/post-list.njk" %}
+
+  {% if pagination.pages.length > 1 %}
+    <nav class="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-ef-bg2 pt-6 text-sm" aria-label="{{ 'Sayfalar' if lang == 'tr' else 'Pagination' }}">
+      {% if pagination.href.previous %}
+        <a class="text-ef-grey2 transition-colors hover:text-ef-green" href="{{ pagination.href.previous }}">← {{ 'Daha yeni' if lang == 'tr' else 'Newer' }}</a>
+      {% else %}<span class="text-ef-bg4">← {{ 'Daha yeni' if lang == 'tr' else 'Newer' }}</span>{% endif %}
+
+      <ol class="flex flex-wrap gap-2">
+        {% for pageEntry in pagination.pages %}
+          {% set url = pagination.hrefs[loop.index0] %}
+          <li>
+            <a href="{{ url }}"
+               class="inline-block rounded border px-2.5 py-1 transition-colors {{ 'border-ef-green text-ef-green' if page.url == url else 'border-ef-bg3 text-ef-grey2 hover:border-ef-green hover:text-ef-green' }}"
+               {% if page.url == url %}aria-current="page"{% endif %}>{{ loop.index }}</a>
+          </li>
+        {% endfor %}
+      </ol>
+
+      {% if pagination.href.next %}
+        <a class="text-ef-grey2 transition-colors hover:text-ef-green" href="{{ pagination.href.next }}">{{ 'Daha eski' if lang == 'tr' else 'Older' }} →</a>
+      {% else %}<span class="text-ef-bg4">{{ 'Daha eski' if lang == 'tr' else 'Older' }} →</span>{% endif %}
+    </nav>
+  {% endif %}
+</div>
