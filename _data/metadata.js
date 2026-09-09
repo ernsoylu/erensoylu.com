@@ -5,8 +5,7 @@ export default {
   description: "Engineer, Thinker, Art Enthusiast",
   author: {
     name: "Eren SOYLU",
-    email: "hello@erensoylu.com",
-    location: "United Kingdom",
+    location: "Earth",
   },
   social: [
     { name: "GitHub", url: "https://github.com/ernsoylu" },
